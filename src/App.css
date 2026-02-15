@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App Container */
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tab Buttons */
+.tab-btn {
+  @apply flex items-center gap-2 px-4 py-2 rounded-lg font-medium bg-transparent text-white transition-colors duration-200;
+}
+.tab-btn.active,
+.tab-btn:active,
+.tab-btn:focus,
+.tab-btn:hover {
+  @apply bg-blue-900 shadow font-bold;
+}
+
+/* Card Style */
+.app-card {
+  @apply bg-white rounded-xl shadow-md border border-gray-200 p-6 mb-4;
+}
+
+/* Add/Action Button Style - use for all add/create actions */
+.app-add-btn {
+  @apply flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-full text-base transition;
+}
+
+/* Footer */
+.app-footer {
+  @apply w-full text-center py-4 mt-6 text-gray-500 text-sm;
+}
+
+.app-footer-logos {
+  @apply flex justify-center items-center gap-4 mb-2;
+}
+
+.logo-image {
+  height: 48px;
+  width: 48px;
+  object-fit: contain;
+}
