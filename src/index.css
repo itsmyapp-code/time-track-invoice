@@ -3,16 +3,280 @@
 @tailwind utilities;
 
 /* Your custom CSS or other imports can follow here */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+  /* slate-50 */
+  color: #0f172a;
+  /* slate-900 */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.app-bg-gradient {
+  background: linear-gradient(135deg, #00AEEF, #FFFFFF, #F58220);
+}
+
+.dark .app-bg-gradient {
+  background: #0f172a !important;
+}
+
+/* Dark Mode Support via toggle class */
+.dark body {
+  background-color: #0f172a;
+  color: #f8fafc;
+  color-scheme: dark;
+}
+
+.dark .bg-white,
+.dark .bg-slate-50,
+.dark .bg-gray-50,
+.dark .bg-gray-100,
+.dark .bg-blue-50,
+.dark .bg-orange-50,
+.dark .bg-indigo-50,
+.dark .bg-purple-50,
+.dark .bg-red-50,
+.dark .bg-green-50,
+.dark .bg-yellow-50 {
+  background-color: #1e293b !important;
+  color: #f8fafc;
+}
+
+.dark .text-blue-700,
+.dark .text-indigo-700,
+.dark .text-purple-700 {
+  color: #93c5fd !important;
+}
+
+.dark .text-slate-800,
+.dark .text-gray-800,
+.dark .text-gray-900,
+.dark .text-slate-900,
+.dark .text-black {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-500,
+.dark .text-gray-500,
+.dark .text-gray-600,
+.dark .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-blue-500,
+.dark .text-blue-600 {
+  color: #60a5fa !important;
+}
+
+.dark .text-blue-700,
+.dark .text-blue-800,
+.dark .text-blue-900 {
+  color: #93c5fd !important;
+}
+
+.dark .border,
+.dark .border-slate-100,
+.dark .border-gray-200,
+.dark .border-gray-300 {
+  border-color: #334155 !important;
+}
+
+.dark .bg-blue-100 {
+  background-color: #1e3a8a !important;
+  color: #dbeafe !important;
+}
+
+.dark .bg-blue-200 {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.dark .bg-green-100 {
+  background-color: #064e3b !important;
+  color: #34d399 !important;
+}
+
+.dark .bg-yellow-100 {
+  background-color: #78350f !important;
+  color: #fbbf24 !important;
+}
+
+.dark .bg-red-100 {
+  background-color: #7f1d1d !important;
+  color: #f87171 !important;
+}
+
+.dark .app-card {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+  border-color: #475569 !important;
+}
+
+.dark th {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+.dark tr:hover td {
+  background-color: #334155 !important;
+}
+
+.dark table {
+  color: #f8fafc !important;
+}
+
+.dark .shadow-lg,
+.dark .shadow-xl {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  /* Provide automatic dark mode fallback if the user hasn't explicitly set it */
+  :root:not(.light) body {
+    background-color: #0f172a;
+    color: #f8fafc;
+    color-scheme: dark;
+  }
+
+  :root:not(.light) .bg-white,
+  :root:not(.light) .bg-slate-50,
+  :root:not(.light) .bg-gray-50,
+  :root:not(.light) .bg-gray-100,
+  :root:not(.light) .bg-blue-50,
+  :root:not(.light) .bg-orange-50,
+  :root:not(.light) .bg-indigo-50,
+  :root:not(.light) .bg-purple-50 {
+    background-color: #1e293b !important;
+    color: #f8fafc;
+  }
+
+  :root:not(.light) .text-blue-700,
+  :root:not(.light) .text-indigo-700,
+  :root:not(.light) .text-purple-700 {
+    color: #93c5fd !important;
+  }
+
+  :root:not(.light) .text-slate-800,
+  :root:not(.light) .text-gray-800,
+  :root:not(.light) .text-gray-900,
+  :root:not(.light) .text-slate-900,
+  :root:not(.light) .text-black {
+    color: #f1f5f9 !important;
+  }
+
+  :root:not(.light) .text-slate-500,
+  :root:not(.light) .text-gray-500,
+  :root:not(.light) .text-gray-600,
+  :root:not(.light) .text-gray-700 {
+    color: #cbd5e1 !important;
+  }
+
+  :root:not(.light) .border,
+  :root:not(.light) .border-slate-100,
+  :root:not(.light) .border-gray-200,
+  :root:not(.light) .border-gray-300 {
+    border-color: #334155 !important;
+  }
+
+  :root:not(.light) .bg-blue-100 {
+    background-color: #1e3a8a !important;
+    color: #dbeafe !important;
+  }
+
+  :root:not(.light) .text-blue-900 {
+    color: #dbeafe !important;
+  }
+
+  :root:not(.light) .text-blue-800 {
+    color: #93c5fd !important;
+  }
+
+  :root:not(.light) .app-card {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  :root:not(.light) input,
+  :root:not(.light) select,
+  :root:not(.light) textarea {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+  }
+
+  :root:not(.light) th {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+  }
+
+  :root:not(.light) tr:hover td {
+    background-color: #334155 !important;
+  }
+
+  :root:not(.light) table {
+    color: #f8fafc !important;
+  }
+
+  :root:not(.light) .shadow-lg,
+  :root:not(.light) .shadow-xl {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  :root:not(.light) .app-bg-gradient {
+    background: #0f172a !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  /* Hide unnecessary elements */
+  header, aside, footer, .hide-on-print {
+    display: none !important;
+  }
+
+  /* Reset layout constraints for printing */
+  html, body, #root, .flex-1, main {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    display: block !important;
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure the printed content takes the full width */
+  .max-w-6xl {
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+  }
+  
+  /* Break pages correctly */
+  tr, img, h2, h3 {
+    page-break-inside: avoid;
+  }
 }

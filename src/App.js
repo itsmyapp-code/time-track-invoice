@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "./firebase";
+import { getApp } from "firebase/app";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
@@ -29,58 +31,42 @@ import JobsPage from "./JobsPage";
 import DashboardPage from "./DashboardPage";
 import ReportsPage from "./ReportsPage";
 import HelpPage from "./HelpPage";
-import { FaSignOutAlt, FaCog, FaQuestionCircle } from "react-icons/fa";
+import Layout from "./components/Layout";
+import AuthView from "./components/AuthView";
+import LandingPage from "./components/LandingPage";
+import Paywall from "./components/Paywall";
+import AdminPage from "./components/AdminPage";
+import { FaSignOutAlt, FaCog, FaQuestionCircle, FaUserShield } from "react-icons/fa";
 import { addOfflineAction, getOfflineActions, clearOfflineActions } from './offlineActions';
+import { usePwsReminders } from './hooks/usePwsReminders';
 // serviceWorkerRegistration.register();
 
-const AuthView = ({
-  handleLogin,
-  handleSignUp,
-  authError,
-  handlePasswordReset,
-  email,
-  setEmail,
-  onSignUpSuccess
-}) => {
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
-  return (
-    <div className="p-4 max-w-md mx-auto bg-white rounded-lg shadow-lg"
-      style={{ background: "linear-gradient(135deg, #00AEEF, #FFFFFF, #F58220)" }}>
-      <div className="flex items-center mb-4 logo-container">
-        <a href="https://itsmyapp.co.uk" target="_blank" rel="noopener noreferrer">
-          <img src="/logo.png" alt="Logo" className="logo-image" style={{ height: "48px", width: "48px", objectFit: "contain" }} />
-        </a>
-        <h2 className="text-2xl font-bold text-gray-800">Time Track Invoice</h2>
-      </div>
-      <input className="w-full p-2 mb-2 border rounded-lg" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
-      <div className="relative">
-        <input className="w-full p-2 mb-2 border rounded-lg" type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
-        <button type="button" className="absolute right-2 top-2 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
-          {showPassword ? "Hide" : "Show"}
-        </button>
-      </div>
-      {authError && <p className="text-red-500 mb-2">{authError}</p>}
-      <button className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg mb-2"
-        onClick={() => handleLogin(email, password)}>Login</button>
-      <button className="w-full bg-green-700 hover:bg-green-800 text-white p-2 rounded-lg mb-2 transition duration-200"
-        onClick={async () => {
-          const success = await handleSignUp(email, password);
-          if (success && onSignUpSuccess) onSignUpSuccess();
-        }}>
-        Create Account
-      </button>
-      <button className="w-full bg-gray-200 hover:bg-gray-300 p-2 rounded-lg transition duration-200"
-        onClick={() => handlePasswordReset(email)} disabled={!email}>Forgot Password?</button>
-    </div>
-  );
-};
 
 
 const SettingsView = ({ settings, updateSettings, navigate }) => {
   const [form, setForm] = useState(settings || {});
+  const [loadingPortal, setLoadingPortal] = useState(false);
   useEffect(() => { setForm(settings || {}); }, [settings]);
+
+  const handleManageSubscription = async () => {
+    setLoadingPortal(true);
+    try {
+      const functions = getFunctions(getApp(), 'us-central1');
+      const functionRef = httpsCallable(functions, 'ext-firestore-stripe-payments-createPortalLink');
+      const { data } = await functionRef({ returnUrl: window.location.origin + "/dashboard" });
+      if (data && data.url) {
+        window.location.assign(data.url);
+      } else {
+        alert("Could not load Stripe portal.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error contacting the billing system. Are you subscribed yet? " + err.message);
+    }
+    setLoadingPortal(false);
+  };
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-2">Business Details (for invoices)</h2>
@@ -103,7 +89,12 @@ const SettingsView = ({ settings, updateSettings, navigate }) => {
         ))}
         <button className="bg-blue-600 text-white rounded px-3 py-2 mt-2">Save</button>
       </form>
-      <button className="bg-blue-600 text-white px-4 py-2 rounded mt-4" onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
+      <div className="flex gap-4 mt-6">
+        <button className="bg-slate-200 text-slate-800 px-4 py-2 rounded hover:bg-slate-300" onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
+        <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 disabled:opacity-50" disabled={loadingPortal} type="button" onClick={handleManageSubscription}>
+          {loadingPortal ? "Loading Portal..." : "Manage Subscription"}
+        </button>
+      </div>
     </div>
   );
 };
@@ -114,12 +105,18 @@ const App = () => {
   const [jobs, setJobs] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [clients, setClients] = useState([]);
+  const [dayItems, setDayItems] = useState([]);
   const [savedInvoices, setSavedInvoices] = useState([]);
   const [settings, setSettings] = useState({});
   const [authError, setAuthError] = useState(null);
   const [authEmail, setAuthEmail] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [pendingSignUp, setPendingSignUp] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [isLoadingPro, setIsLoadingPro] = useState(true);
+
+  // --- Hourly Reminders Hook ---
+  usePwsReminders(!!user);
 
   // --- Reports Page State & Filtering ---
   const [startDate, setStartDate] = useState("");
@@ -218,6 +215,9 @@ const App = () => {
             if (action.type === 'deleteClient') {
               await deleteDoc(doc(db, "users", user.uid, "clients", action.clientId));
             }
+            if (action.type === 'deleteDayItem') {
+              await deleteDoc(doc(db, "users", user.uid, "dayItems", action.itemId));
+            }
           } catch (err) {
             console.error("Error syncing offline action:", action, err);
           }
@@ -229,15 +229,56 @@ const App = () => {
 
   const navigate = useNavigate();
   useEffect(() => {
-    let unsubscribeSettings = () => {};
+    let unsubscribeSettings = () => { };
     const unsubscribeAuth = onAuthStateChanged(auth, async user => {
       setUser(user);
       if (user) {
         try {
-          onSnapshot(query(collection(db, "users", user.uid, "jobs"), orderBy("createdAt")), snapshot => setJobs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
-          onSnapshot(query(collection(db, "users", user.uid, "sessions"), orderBy("startTime")), snapshot => setSessions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
-          onSnapshot(query(collection(db, "users", user.uid, "clients"), orderBy("createdAt")), snapshot => setClients(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
-          onSnapshot(query(collection(db, "users", user.uid, "invoices"), orderBy("createdAt")), snapshot => setSavedInvoices(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))));
+          // Save or update user email in the database for admin reference
+          if (user.email) {
+            await setDoc(doc(db, "users", user.uid), { email: user.email }, { merge: true });
+          }
+
+          onSnapshot(query(collection(db, "users", user.uid, "jobs"), orderBy("createdAt")), snapshot => setJobs(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))));
+          onSnapshot(query(collection(db, "users", user.uid, "sessions"), orderBy("startTime")), snapshot => setSessions(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))));
+          onSnapshot(query(collection(db, "users", user.uid, "clients"), orderBy("createdAt")), snapshot => setClients(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))));
+          onSnapshot(query(collection(db, "users", user.uid, "dayItems"), orderBy("date")), snapshot => setDayItems(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))));
+          onSnapshot(query(collection(db, "users", user.uid, "dayItems"), orderBy("date")), snapshot => setDayItems(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))));
+          onSnapshot(query(collection(db, "users", user.uid, "invoices"), orderBy("createdAt")), snapshot => setSavedInvoices(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }))));
+
+          // Combined Pro listener
+          let subscriptionActive = false;
+          let overrideActive = false;
+
+          const updateProStatus = (sub, override) => {
+            const isAdmin = user.email && user.email.toLowerCase() === 'martin@cozens.me.uk';
+            setIsPro(sub || override || isAdmin);
+            setIsLoadingPro(false);
+          };
+
+          // 1. Subscription listener
+          const subRef = collection(db, "users", user.uid, "subscriptions");
+          const unsubSub = onSnapshot(subRef, snap => {
+            subscriptionActive = false;
+            snap.forEach(doc => {
+              const data = doc.data();
+              if (data.status === 'active' || data.status === 'trialing') subscriptionActive = true;
+            });
+            updateProStatus(subscriptionActive, overrideActive);
+          }, (err) => {
+            console.error("Subscription snapshot error:", err);
+            updateProStatus(subscriptionActive, overrideActive);
+          });
+
+          // 2. Pro Override listener
+          const unsubUserDoc = onSnapshot(doc(db, "users", user.uid), userDocSnap => {
+            overrideActive = false;
+            if (userDocSnap.exists() && userDocSnap.data().proOverride) {
+              overrideActive = true;
+            }
+            updateProStatus(subscriptionActive, overrideActive);
+          });
+
           const settingsRef = doc(db, "users", user.uid, "settings", "userSettings");
           unsubscribeSettings = onSnapshot(settingsRef, docSnap => {
             if (docSnap.exists()) setSettings(docSnap.data());
@@ -249,9 +290,13 @@ const App = () => {
       } else {
         setJobs([]);
         setSessions([]);
+        setDayItems([]);
+        setClients([]);
         setClients([]);
         setSavedInvoices([]);
         setSettings({});
+        setIsPro(false);
+        setIsLoadingPro(false);
       }
     });
     return () => { unsubscribeAuth(); unsubscribeSettings(); };
@@ -350,16 +395,31 @@ const App = () => {
     }
   }, [user, isOnline, sessions]);
 
-  const handleManualEntry = useCallback(async (jobId, { startTime, endTime, duration }) => {
+  const handleManualEntry = useCallback(async (jobId, { startTime, endTime, duration, description }) => {
     if (user) {
       if (!isOnline) {
-        await addOfflineAction({ type: 'manualEntry', jobId, startTime, endTime, duration });
+        await addOfflineAction({ type: 'manualEntry', jobId, startTime, endTime, duration, description });
         return;
       }
       try {
-        await addDoc(collection(db, "users", user.uid, "sessions"), { jobId, startTime, endTime, duration, createdAt: serverTimestamp() });
+        await addDoc(collection(db, "users", user.uid, "sessions"), { jobId, startTime, endTime, duration, description, createdAt: serverTimestamp() });
       } catch (error) {
         console.error("Manual entry error:", error);
+      }
+    }
+  }, [user, isOnline]);
+
+  const handleAddDayItem = useCallback(async (jobId, { date, type }) => {
+    if (user) {
+      if (!isOnline) {
+        // Simple offline fallback
+        await addOfflineAction({ type: 'addDayItem', jobId, date, itemType: type });
+        return;
+      }
+      try {
+        await addDoc(collection(db, "users", user.uid, "dayItems"), { jobId, date, type, createdAt: serverTimestamp() });
+      } catch (error) {
+        console.error("Add day item error:", error);
       }
     }
   }, [user, isOnline]);
@@ -409,6 +469,26 @@ const App = () => {
     }
   }, [user, isOnline]);
 
+  const archiveClient = useCallback(async (clientId, isArchived) => {
+    if (user) {
+      try {
+        await updateDoc(doc(db, "users", user.uid, "clients", clientId), { isArchived });
+      } catch (error) {
+        console.error("Archive client error:", error);
+      }
+    }
+  }, [user]);
+
+  const archiveJob = useCallback(async (jobId, isArchived) => {
+    if (user) {
+      try {
+        await updateDoc(doc(db, "users", user.uid, "jobs", jobId), { isArchived });
+      } catch (error) {
+        console.error("Archive job error:", error);
+      }
+    }
+  }, [user]);
+
   const saveInvoice = useCallback(async invoiceData => {
     if (user) {
       if (!isOnline) {
@@ -416,7 +496,12 @@ const App = () => {
         return;
       }
       try {
-        await addDoc(collection(db, "users", user.uid, "invoices"), invoiceData);
+        if (invoiceData.id) {
+          const { id, ...data } = invoiceData;
+          await setDoc(doc(db, "users", user.uid, "invoices", id), data, { merge: true });
+        } else {
+          await addDoc(collection(db, "users", user.uid, "invoices"), invoiceData);
+        }
       } catch (error) {
         console.error("Save invoice error:", error);
       }
@@ -452,14 +537,40 @@ const App = () => {
     }
   }, [user, isOnline]);
 
+  const deleteDayItem = useCallback(async (itemId) => {
+    if (user) {
+      if (!isOnline) {
+        await addOfflineAction({ type: 'deleteDayItem', itemId });
+        return;
+      }
+      try {
+        await deleteDoc(doc(db, "users", user.uid, "dayItems", itemId));
+      } catch (error) {
+        console.error("Delete day item error:", error);
+      }
+    }
+  }, [user, isOnline]);
+
   const deleteInvoice = useCallback(async (invoiceId) => {
+    console.log("Delete invoice called with:", invoiceId, "User:", user?.uid);
+    if (!invoiceId) {
+      console.error("Invalid invoiceId:", invoiceId);
+      return;
+    }
+    if (typeof invoiceId !== 'string') {
+      console.error("Invalid invoiceId type:", typeof invoiceId, invoiceId);
+      return;
+    }
+
     if (user) {
       if (!isOnline) {
         await addOfflineAction({ type: 'deleteInvoice', invoiceId });
         return;
       }
       try {
-        await deleteDoc(doc(db, "users", user.uid, "invoices", invoiceId));
+        const docRef = doc(db, "users", user.uid, "invoices", invoiceId);
+        console.log("Deleting doc ref:", docRef.path);
+        await deleteDoc(docRef);
       } catch (error) {
         console.error("Delete invoice error:", error);
       }
@@ -491,126 +602,133 @@ const App = () => {
   }, [user]);
 
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #00AEEF, #FFFFFF, #F58220)" }}>
+    <div className="min-h-screen app-bg-gradient">
       {!isOnline && (
         <div className="bg-yellow-200 text-yellow-800 text-center p-2 mb-2">
           Offline: changes will be synced when connection is restored.
         </div>
       )}
-      {!user ? (
-        <AuthView
-          handleLogin={handleLogin}
-          handleSignUp={handleSignUp}
-          authError={authError}
-          handlePasswordReset={handlePasswordReset}
-          email={authEmail}
-          setEmail={setAuthEmail}
-          onSignUpSuccess={() => setPendingSignUp(true)}
-        />
-      ) : (
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="flex justify-between items-center mb-6 pt-6 logo-container">
-            <a href="https://itsmyapp.co.uk" target="_blank" rel="noopener noreferrer">
-              <img src={`/logo.png?v=${new Date().getTime()}`} alt="Logo" className="logo-image" style={{ height: "48px", width: "48px", objectFit: "contain" }} />
-            </a>
-            <div className="flex items-center space-x-2">
-              <button
-                className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg transition duration-200"
-                onClick={handleLogout}
-                title="Logout"
-                aria-label="Logout"
-              >
-                <FaSignOutAlt size={20} />
-              </button>
-              <button
-                className="bg-blue-500 hover:bg-blue-700 p-2 rounded-lg transition duration-200"
-                onClick={() => navigate("/settings")}
-                title="Settings"
-                aria-label="Settings"
-              >
-                <FaCog size={20} />
-              </button>
-              <button
-                className="bg-purple-500 hover:bg-purple-700 p-2 rounded-lg transition duration-200"
-                onClick={() => navigate("/help")}
-                title="Help"
-                aria-label="Help"
-              >
-                <FaQuestionCircle size={20} />
-              </button>
+
+      {/* If absolutely not logged in, we only allow access to landing page, or they hit auth view. If they hit / we show landing page, if they hit /app we show auth view */}
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Everything else requires login */}
+        <Route path="*" element={
+          !user ? (
+            <AuthView
+              handleLogin={handleLogin}
+              handleSignUp={handleSignUp}
+              authError={authError}
+              handlePasswordReset={handlePasswordReset}
+              email={authEmail}
+              setEmail={setAuthEmail}
+              onSignUpSuccess={() => setPendingSignUp(true)}
+            />
+          ) : isLoadingPro && user.email !== 'martin@cozens.me.uk' ? (
+            <div className="flex h-screen items-center justify-center bg-gray-50">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading your account...</p>
+              </div>
             </div>
-          </div>
-          {/* Removed old Menu navigation for mobile-friendly dropdowns on each page */}
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="/dashboard" element={
-              <DashboardPage
-                jobs={jobs}
-                clients={clients}
-                sessions={sessions}
-                invoices={savedInvoices}
-                setActiveView={view => navigate(`/${view}`)}
+          ) : (!isPro && (!user.email || user.email.toLowerCase() !== 'martin@cozens.me.uk')) ? (
+            <Layout user={user} isPro={isPro} handleLogout={handleLogout}>
+              <Paywall
+                db={db}
+                user={user}
+                onSuccess={() => setIsPro(true)}
               />
-            } />
-            <Route path="/jobs" element={
-              <JobsPage
-                clients={clients}
-                jobs={jobsWithSessions}
-                startTimer={startTimer}
-                stopTimer={stopTimer}
-                handleManualEntry={handleManualEntry}
-                sessions={sessions}
-                handleAddJob={handleAddJob}
-                deleteSession={deleteSession}
-                deleteJob={deleteJob}
-                setActiveView={view => navigate(`/${view}`)}
-              />
-            } />
-            <Route path="/invoices" element={
-              <InvoicesPage
-                jobs={jobsWithSessions}
-                clients={clients}
-                savedInvoices={savedInvoices}
-                sessions={sessions}
-                saveInvoice={saveInvoice}
-                settings={settings}
-                deleteInvoice={deleteInvoice}
-                updateInvoiceStatus={updateInvoiceStatus}
-                setActiveView={view => navigate(`/${view}`)}
-              />
-            } />
-            <Route path="/clients" element={
-              <ClientsPage
-                clients={clients}
-                addClient={addClient}
-                editClient={editClient}
-                savedInvoices={savedInvoices}
-                deleteClient={deleteClient}
-                setActiveView={view => navigate(`/${view}`)}
-              />
-            } />
-            <Route path="/reports" element={
-              <ReportsPage
-                jobs={jobs}
-                clients={clients}
-                sessions={sessions}
-                startDate={startDate}
-                endDate={endDate}
-                setStartDate={setStartDate}
-                setEndDate={setEndDate}
-                selectedClientId={selectedClientId}
-                setSelectedClientId={setSelectedClientId}
-                generateReport={() => window.print()}
-                setActiveView={view => navigate(`/${view}`)}
-              />
-            } />
-            <Route path="/settings" element={
-              <SettingsView settings={settings} updateSettings={updateSettings} navigate={navigate} />
-            } />
-            <Route path="/help" element={<HelpPage />} />
-          </Routes>
-        </div>
-      )}
+            </Layout>
+          ) : (
+            <Layout user={user} isPro={isPro} handleLogout={handleLogout}>
+              <Routes>
+                <Route path="/app" element={<Navigate to="/dashboard" />} />
+                <Route path="/dashboard" element={
+                  <DashboardPage
+                    jobs={jobs}
+                    clients={clients}
+                    sessions={sessions}
+                    handleManualEntry={handleManualEntry}
+                    handleAddDayItem={handleAddDayItem}
+                    invoices={savedInvoices}
+                    setActiveView={view => navigate(`/${view}`)}
+                  />
+                } />
+                <Route path="/jobs" element={
+                  <JobsPage
+                    clients={clients}
+                    jobs={jobsWithSessions}
+                    startTimer={startTimer}
+                    stopTimer={stopTimer}
+                    handleManualEntry={handleManualEntry}
+                    sessions={sessions}
+                    handleAddJob={handleAddJob}
+                    deleteSession={deleteSession}
+                    deleteJob={deleteJob}
+                    archiveJob={archiveJob}
+                    dayItems={dayItems}
+                    deleteDayItem={deleteDayItem}
+                    setActiveView={view => navigate(`/${view}`)}
+                  />
+                } />
+                <Route path="/invoices" element={
+                  <InvoicesPage
+                    jobs={jobsWithSessions}
+                    clients={clients}
+                    savedInvoices={savedInvoices}
+                    sessions={sessions}
+                    dayItems={dayItems}
+                    saveInvoice={saveInvoice}
+                    settings={settings}
+                    deleteInvoice={deleteInvoice}
+                    updateInvoiceStatus={updateInvoiceStatus}
+                    setActiveView={view => navigate(`/${view}`)}
+                  />
+                } />
+                <Route path="/clients" element={
+                  <ClientsPage
+                    clients={clients}
+                    addClient={addClient}
+                    editClient={editClient}
+                    savedInvoices={savedInvoices}
+                    deleteClient={deleteClient}
+                    archiveClient={archiveClient}
+                    setActiveView={view => navigate(`/${view}`)}
+                  />
+                } />
+                <Route path="/reports" element={
+                  <ReportsPage
+                    jobs={jobs}
+                    clients={clients}
+                    sessions={sessions}
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
+                    selectedClientId={selectedClientId}
+                    setSelectedClientId={setSelectedClientId}
+                    invoices={savedInvoices}
+                    settings={settings}
+                    generateReport={() => window.print()}
+                    setActiveView={view => navigate(`/${view}`)}
+                  />
+                } />
+                <Route path="/settings" element={
+                  <SettingsView settings={settings} updateSettings={updateSettings} navigate={navigate} />
+                } />
+                <Route path="/help" element={<HelpPage />} />
+
+                {/* Admin Route */}
+                {user.email && user.email.toLowerCase() === 'martin@cozens.me.uk' && (
+                  <Route path="/admin" element={<AdminPage d={db} navigate={navigate} />} />
+                )}
+
+              </Routes>
+            </Layout>
+          )
+        } />
+      </Routes>
     </div>
   );
 };

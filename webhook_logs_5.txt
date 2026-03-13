@@ -1,0 +1,260 @@
+2026-02-23T12:07:24.888940Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.UpdateFunction","resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents"}
+2026-02-23T12:08:18.735480Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"service-440566168766@gcp-sa-firebasemods.iam.gserviceaccount.com"},"requestMetadata":{"callerIp":"private","callerSuppliedUserAgent":"stubby_client","requestAttributes":{"time":"2026-02-23T12:08:18.972683Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.SetIamPolicy","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.setIamPolicy","granted":true,"resourceAttributes":{},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","request":{"@type":"type.googleapis.com/google.iam.v1.SetIamPolicyRequest","updateMask":"bindings","policy":{"bindings":[{"role":"roles/cloudfunctions.invoker","members":["allUsers"]}]},"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents"},"response":{"etag":"BwZLfKBgbiQ=","bindings":[{"members":["allUsers"],"role":"roles/cloudfunctions.invoker"}],"@type":"type.googleapis.com/google.iam.v1.Policy"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:08:42.157468512Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:08:42.214700Z I ext-firestore-stripe-payments-handleWebhookEvents: ?????? Handling Stripe event [evt_1T3xwJGCIxb6jEflc8R8tT4L] of type [product.updated].
+2026-02-23T12:08:42.989084214Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:08:43.043376Z I ext-firestore-stripe-payments-handleWebhookEvents: ???????? Added doc [prod_U1GKmgpptf6C3G] to collection [products] in Firestore.
+2026-02-23T12:08:43.194130Z I ext-firestore-stripe-payments-handleWebhookEvents: ???Successfully handled Stripe event [evt_1T3xwJGCIxb6jEflc8R8tT4L] of type [product.updated].
+2026-02-23T12:08:43.196709045Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 1039 ms, finished with status code: 200
+2026-02-23T12:08:43.201998Z I ext-firestore-stripe-payments-handleWebhookEvents: ?????? Handling Stripe event [evt_1T3xwKGCIxb6jEfl4uxWXkZl] of type [product.updated].
+2026-02-23T12:08:46.769534Z I ext-firestore-stripe-payments-handleWebhookEvents: ???????? Added doc [prod_U1GKmgpptf6C3G] to collection [products] in Firestore.
+2026-02-23T12:08:46.927243Z I ext-firestore-stripe-payments-handleWebhookEvents: ???Successfully handled Stripe event [evt_1T3xwKGCIxb6jEfl4uxWXkZl] of type [product.updated].
+2026-02-23T12:08:46.929853591Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 3940 ms, finished with status code: 200
+2026-02-23T12:10:11.653419341Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:10:11.832435Z I ext-firestore-stripe-payments-handleWebhookEvents: ?????? Handling Stripe event [evt_1T3xxnGCIxb6jEfl6LkwbuKK] of type [product.updated].
+2026-02-23T12:10:14.205925257Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:10:14.384475Z I ext-firestore-stripe-payments-handleWebhookEvents: ?????? Handling Stripe event [evt_1T3xxoGCIxb6jEflRLlYtrkF] of type [product.updated].
+2026-02-23T12:10:15.791375Z I ext-firestore-stripe-payments-handleWebhookEvents: ???????? Added doc [prod_U1GKmgpptf6C3G] to collection [products] in Firestore.
+2026-02-23T12:10:15.929817Z I ext-firestore-stripe-payments-handleWebhookEvents: ???Successfully handled Stripe event [evt_1T3xxnGCIxb6jEfl6LkwbuKK] of type [product.updated].
+2026-02-23T12:10:15.931915300Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 4278 ms, finished with status code: 200
+2026-02-23T12:10:17.541553Z I ext-firestore-stripe-payments-handleWebhookEvents: ???????? Added doc [prod_U1GKmgpptf6C3G] to collection [products] in Firestore.
+2026-02-23T12:10:17.701464Z I ext-firestore-stripe-payments-handleWebhookEvents: ???Successfully handled Stripe event [evt_1T3xxoGCIxb6jEflRLlYtrkF] of type [product.updated].
+2026-02-23T12:10:17.703274313Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 3497 ms, finished with status code: 200
+2026-02-23T12:10:56.263373966Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:10:56.566427693Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:10:56.573250Z I ext-firestore-stripe-payments-handleWebhookEvents: ?????? Handling Stripe event [evt_1T3xyWGCIxb6jEflVDovxHkN] of type [price.updated].
+2026-02-23T12:10:56.679178Z I ext-firestore-stripe-payments-handleWebhookEvents: ?????? Handling Stripe event [evt_1T3xyVGCIxb6jEfl6Y5B8v76] of type [product.updated].
+2026-02-23T12:10:56.733939Z I ext-firestore-stripe-payments-handleWebhookEvents: ???????? Added doc [price_1T3DnQGCIxb6jEflmOCn7RnG] to collection [prices] in Firestore.
+2026-02-23T12:10:56.847746Z I ext-firestore-stripe-payments-handleWebhookEvents: ???Successfully handled Stripe event [evt_1T3xyWGCIxb6jEflVDovxHkN] of type [price.updated].
+2026-02-23T12:10:56.848839452Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 282 ms, finished with status code: 200
+2026-02-23T12:10:56.880983499Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:10:56.884416Z I ext-firestore-stripe-payments-handleWebhookEvents: ?????? Handling Stripe event [evt_1T3xyWGCIxb6jEflPv68PTuO] of type [product.updated].
+2026-02-23T12:10:56.918367Z I ext-firestore-stripe-payments-handleWebhookEvents: ???????? Added doc [prod_U1GKmgpptf6C3G] to collection [products] in Firestore.
+2026-02-23T12:10:56.997196Z I ext-firestore-stripe-payments-handleWebhookEvents: ???Successfully handled Stripe event [evt_1T3xyVGCIxb6jEfl6Y5B8v76] of type [product.updated].
+2026-02-23T12:10:56.998323686Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 734 ms, finished with status code: 200
+2026-02-23T12:10:57.252887Z I ext-firestore-stripe-payments-handleWebhookEvents: ???????? Added doc [prod_U1GKmgpptf6C3G] to collection [products] in Firestore.
+2026-02-23T12:10:57.336822Z I ext-firestore-stripe-payments-handleWebhookEvents: ???Successfully handled Stripe event [evt_1T3xyWGCIxb6jEflPv68PTuO] of type [product.updated].
+2026-02-23T12:10:57.338296790Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 457 ms, finished with status code: 200
+2026-02-23T12:11:08.189572738Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:11:08.275655331Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 86 ms, finished with status code: 200
+2026-02-23T12:17:23.128690Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"callerIp":"108.177.66.137","callerSuppliedUserAgent":"Google-Deployment-Manager,gzip(gfe),gzip(gfe)","requestAttributes":{"time":"2026-02-23T12:17:23.310567Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.DeleteFunction","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.delete","granted":true,"resourceAttributes":{},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","request":{"name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","@type":"type.googleapis.com/google.cloud.functions.v1.DeleteFunctionRequest"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:17:23.293841292Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"callerIp":"::1","requestAttributes":{"time":"2026-02-23T12:17:23.250712804Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v2.FunctionService.DeleteFunction","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.delete","granted":true,"resourceAttributes":{"service":"cloudfunctions.googleapis.com","name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","type":"cloudfunctions.googleapis.com/Function"},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","request":{"@type":"type.googleapis.com/google.cloud.functions.v2.DeleteFunctionRequest","name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents"},"response":{"@type":"type.googleapis.com/google.longrunning.Operation"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:17:23.348347Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"requestAttributes":{"time":"2026-02-23T12:17:24.570704Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.DeleteFunction","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.delete","granted":true,"resourceAttributes":{},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:17:24.566319Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.DeleteFunction","resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents"}
+2026-02-23T12:17:25.812758546Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"requestAttributes":{},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v2.FunctionService.DeleteFunction","resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","response":{"@type":"type.googleapis.com/google.protobuf.Empty"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:17:56.552281Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"callerIp":"108.177.78.96","callerSuppliedUserAgent":"Google-Deployment-Manager,gzip(gfe),gzip(gfe)","requestAttributes":{"time":"2026-02-23T12:17:57.231793Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.CreateFunction","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.create","granted":true,"resourceAttributes":{},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","request":{"location":"projects/time-tracker-and-invoice/locations/us-central1","@type":"type.googleapis.com/google.cloud.functions.v1.CreateFunctionRequest","function":{"secretEnvironmentVariables":[{"secret":"firestore-stripe-payments-STRIPE_API_KEY","version":"2","key":"STRIPE_API_KEY","projectId":"440566168766"}],"serviceAccountEmail":"ext-firestore-stripe-payments@time-tracker-and-invoice.iam.gserviceaccount.com","httpsTrigger":{},"minInstances":0,"labels":{"goog-firebase-ext-iid":"firestore-stripe-payments","firebase-extensions-ar":"enabled","deployment-tool":"firebase-extensions","goog-firebase-ext":"firestore-stripe-payments"},"runtime":"nodejs20","dockerRegistry":"ARTIFACT_REGISTRY","vpcConnectorEgressSettings":"VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED","entryPoint":"handleWebhookEvents","availableMemoryMb":256,"description":"Handles Stripe webhook events to keep subscription statuses in sync and update custom claims.","name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","ingressSettings":"ALLOW_ALL","sourceArchiveUrl":"gs://firebase-mod-sources-prod/388eb1851f94dadf2f80d2d08616b711f10ddfb173d5e257935020383a0a0c69"}},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:17:57.225067794Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"callerIp":"::1","requestAttributes":{"time":"2026-02-23T12:17:56.585374069Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v2.FunctionService.CreateFunction","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.create","granted":true,"resourceAttributes":{"service":"cloudfunctions.googleapis.com","name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","type":"cloudfunctions.googleapis.com/Function"},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","request":{"function":{"service_config":{"revision":"0","max_instance_request_concurrency":1,"secret_environment_variables":[{"secret":"firestore-stripe-payments-STRIPE_API_KEY","project_id":"440566168766","version":"2","key":"STRIPE_API_KEY"}],"available_memory":"256M","service_account_email":"ext-firestore-stripe-payments@time-tracker-and-invoice.iam.gserviceaccount.com","ingress_settings":"ALLOW_ALL"},"labels":{"firebase-extensions-ar":"enabled","goog-firebase-ext-iid":"firestore-stripe-payments","deployment-tool":"firebase-extensions","goog-firebase-ext":"firestore-stripe-payments"},"description":"Handles Stripe webhook events to keep subscription statuses in sync and update custom claims.","environment":"GEN_1","name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","update_time":{},"build_config":{"entry_point":"handleWebhookEvents","docker_registry":"ARTIFACT_REGISTRY","source":{},"runtime":"nodejs20"}},"@type":"type.googleapis.com/google.cloud.functions.v2.CreateFunctionRequest","parent":"projects/time-tracker-and-invoice/locations/us-central1"},"response":{"@type":"type.googleapis.com/google.longrunning.Operation"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:17:57.265580Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"requestAttributes":{"time":"2026-02-23T12:19:11.662587Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.CreateFunction","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.create","granted":true,"resourceAttributes":{},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:19:11.583781Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.CreateFunction","resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents"}
+2026-02-23T12:19:16.070854147Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"requestAttributes":{},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v2.FunctionService.CreateFunction","resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","response":{"url":"https://us-central1-time-tracker-and-invoice.cloudfunctions.net/ext-firestore-stripe-payments-handleWebhookEvents","@type":"type.googleapis.com/google.cloud.functions.v2.Function","buildConfig":{"entryPoint":"handleWebhookEvents","source":{},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/time-tracker-and-invoice/serviceAccounts/440566168766-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{},"runtime":"nodejs20"},"updateTime":"2026-02-23T12:17:57.212678934Z","name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","serviceConfig":{"availableMemory":"256M","uri":"https://us-central1-time-tracker-and-invoice.cloudfunctions.net/ext-firestore-stripe-payments-handleWebhookEvents","serviceAccountEmail":"ext-firestore-stripe-payments@time-tracker-and-invoice.iam.gserviceaccount.com","ingressSettings":"ALLOW_ALL","revision":"1","maxInstanceRequestConcurrency":1,"securityLevel":"SECURE_OPTIONAL","timeoutSeconds":60,"secretEnvironmentVariables":[{"secret":"firestore-stripe-payments-STRIPE_API_KEY","version":"2","key":"STRIPE_API_KEY","projectId":"440566168766"}]},"satisfiesPzi":true,"description":"Handles Stripe webhook events to keep subscription statuses in sync and update custom claims.","state":"ACTIVE","labels":{"deployment-tool":"firebase-extensions","firebase-extensions-ar":"enabled","goog-firebase-ext":"firestore-stripe-payments","goog-firebase-ext-iid":"firestore-stripe-payments"},"environment":"GEN_1","upgradeInfo":{"upgradeState":"ELIGIBLE_FOR_2ND_GEN_UPGRADE"}},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:19:23.156505Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"440566168766@cloudservices.gserviceaccount.com","serviceAccountDelegationInfo":[{"firstPartyPrincipal":{"principalEmail":"cloud-config-workflow-prod-jobs@prod.google.com"}}],"principalSubject":"serviceAccount:440566168766@cloudservices.gserviceaccount.com","oauthInfo":{"oauthClientId":"anonymous"}},"requestMetadata":{"callerIp":"108.177.78.109","callerSuppliedUserAgent":"Google-Deployment-Manager,gzip(gfe),gzip(gfe)","requestAttributes":{"time":"2026-02-23T12:19:23.422236Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.UpdateFunction","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.update","granted":true,"resourceAttributes":{},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","request":{"function":{"serviceAccountEmail":"ext-firestore-stripe-payments@time-tracker-and-invoice.iam.gserviceaccount.com","ingressSettings":"ALLOW_ALL","runtime":"nodejs20","minInstances":0,"entryPoint":"handleWebhookEvents","availableMemoryMb":256,"description":"Handles Stripe webhook events to keep subscription statuses in sync and update custom claims.","vpcConnectorEgressSettings":"VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED","labels":{"goog-firebase-ext-iid":"firestore-stripe-payments","deployment-tool":"firebase-extensions","firebase-extensions-ar":"enabled","goog-dm":"firebase-ext-firestore-stripe-payments","goog-firebase-ext":"firestore-stripe-payments"},"name":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","secretEnvironmentVariables":[{"key":"STRIPE_API_KEY","version":"2","projectId":"440566168766","secret":"firestore-stripe-payments-STRIPE_API_KEY"}],"dockerRegistry":"ARTIFACT_REGISTRY","httpsTrigger":{},"sourceArchiveUrl":"gs://firebase-mod-sources-prod/388eb1851f94dadf2f80d2d08616b711f10ddfb173d5e257935020383a0a0c69"},"@type":"type.googleapis.com/google.cloud.functions.v1.UpdateFunctionRequest","updateMask":"entryPoint,buildEnvironmentVariables,description,labels,httpsTrigger,sourceArchiveUrl,timeout,minInstances,dockerRegistry,secretEnvironmentVariables,serviceAccountEmail,availableMemoryMb,vpcConnectorEgressSettings,runtime,ingressSettings,environmentVariables"},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:20:21.434009Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","status":{},"authenticationInfo":{},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.UpdateFunction","resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents"}
+2026-02-23T12:20:34.637814Z N ext-firestore-stripe-payments-handleWebhookEvents: {"@type":"type.googleapis.com/google.cloud.audit.AuditLog","authenticationInfo":{"principalEmail":"service-440566168766@gcp-sa-firebasemods.iam.gserviceaccount.com"},"requestMetadata":{"callerIp":"private","callerSuppliedUserAgent":"stubby_client","requestAttributes":{"time":"2026-02-23T12:20:34.877858Z","auth":{}},"destinationAttributes":{}},"serviceName":"cloudfunctions.googleapis.com","methodName":"google.cloud.functions.v1.CloudFunctionsService.SetIamPolicy","authorizationInfo":[{"resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","permission":"cloudfunctions.functions.setIamPolicy","granted":true,"resourceAttributes":{},"permissionType":"ADMIN_WRITE"}],"resourceName":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents","request":{"policy":{"bindings":[{"members":["allUsers"],"role":"roles/cloudfunctions.invoker"}]},"@type":"type.googleapis.com/google.iam.v1.SetIamPolicyRequest","updateMask":"bindings","resource":"projects/time-tracker-and-invoice/locations/us-central1/functions/ext-firestore-stripe-payments-handleWebhookEvents"},"response":{"bindings":[{"role":"roles/cloudfunctions.invoker","members":["allUsers"]}],"@type":"type.googleapis.com/google.iam.v1.Policy","etag":"BwZLfMw9cTM="},"resourceLocation":{"currentLocations":["us-central1"]}}
+2026-02-23T12:27:16.564368398Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:27:16.715344Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:27:16.806472285Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 242 ms, finished with status code: 401
+2026-02-23T12:27:19.515034579Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:27:19.519807Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:27:19.521219889Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 6 ms, finished with status code: 401
+2026-02-23T12:28:42.377329351Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.381549Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.382434881Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 5 ms, finished with status code: 401
+2026-02-23T12:28:42.441037770Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.445109Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.445771380Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 4 ms, finished with status code: 401
+2026-02-23T12:28:42.466899180Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.471807Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.473694790Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 6 ms, finished with status code: 401
+2026-02-23T12:28:42.521886899Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.525811Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.526689569Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 4 ms, finished with status code: 401
+2026-02-23T12:28:42.588977818Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.593337Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.594322178Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 5 ms, finished with status code: 401
+2026-02-23T12:28:42.696936076Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.705077Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.706436596Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 9 ms, finished with status code: 401
+2026-02-23T12:28:42.770118205Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.775707Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.777123415Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 7 ms, finished with status code: 401
+2026-02-23T12:28:42.808221645Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.812569Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.813897885Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 5 ms, finished with status code: 401
+2026-02-23T12:28:42.907897704Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.912944Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.914239164Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 6 ms, finished with status code: 401
+2026-02-23T12:28:42.973855864Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:42.977637Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:42.978386414Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 4 ms, finished with status code: 401
+2026-02-23T12:28:43.065027175Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:43.068536Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:43.069448985Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 4 ms, finished with status code: 401
+2026-02-23T12:28:43.136140216Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:43.139665Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:43.140509616Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 4 ms, finished with status code: 401
+2026-02-23T12:28:43.221332006Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:28:43.225921Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:28:43.226754726Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 5 ms, finished with status code: 401
+2026-02-23T12:29:18.229517592Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution started
+2026-02-23T12:29:18.233353Z E ext-firestore-stripe-payments-handleWebhookEvents: Error: ??????[Error]: Webhook signature verification failed. Is your Stripe webhook secret parameter configured correctly? The "key" argument must be of type string or an instance of ArrayBuffer, Buffer, TypedArray, DataView, KeyObject, or CryptoKey. Received undefined
+    at entryFromArgs (/workspace/node_modules/firebase-functions/lib/logger/index.js:133:19)
+    at Object.error (/workspace/node_modules/firebase-functions/lib/logger/index.js:120:11)
+    at Object.badWebhookSecret (/workspace/lib/logs.js:73:33)
+    at /workspace/lib/index.js:170:14
+    at /workspace/node_modules/firebase-functions/lib/common/onInit.js:33:16
+    at AsyncLocalStorage.run (node:async_hooks:346:14)
+    at /workspace/node_modules/firebase-functions/lib/v2/trace.js:18:37
+    at cloudFunction (/workspace/node_modules/firebase-functions/lib/v1/providers/https.js:53:78)
+    at /layers/google.nodejs.functions-framework/functions-framework/node_modules/@google-cloud/functions-framework/build/src/function_wrappers.js:100:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)
+2026-02-23T12:29:18.234085072Z D ext-firestore-stripe-payments-handleWebhookEvents: Function execution took 4 ms, finished with status code: 401

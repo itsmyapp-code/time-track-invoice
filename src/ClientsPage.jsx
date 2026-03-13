@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaUser, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 
 const DEFAULT_FORM = {
@@ -25,6 +25,35 @@ const ClientsPage = ({
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(DEFAULT_FORM);
   const [editingClient, setEditingClient] = useState(null);
+
+  useEffect(() => {
+    if (showForm) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      console.log("Deep Lock Modal logic active v2");
+    } else {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+    };
+  }, [showForm]);
 
   const handleEdit = (client) => {
     setEditingClient(client);
@@ -138,113 +167,115 @@ const ClientsPage = ({
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40" style={{ zIndex: 2000 }}>
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
-            <h3 className="text-xl font-bold mb-4">
-              {editingClient ? "Edit Client" : "Add Client"}
-            </h3>
-            <div className="grid grid-cols-1 gap-3">
-              <input
-                className="p-2 border rounded"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Client Name"
-              />
-              <input
-                className="p-2 border rounded"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="Email"
-              />
-              <input
-                className="p-2 border rounded"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="Phone"
-              />
-              <input
-                className="p-2 border rounded"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Address"
-              />
-              <input
-                className="p-2 border rounded"
-                value={formData.town}
-                onChange={(e) => setFormData({ ...formData, town: e.target.value })}
-                placeholder="Town"
-              />
-              <input
-                className="p-2 border rounded"
-                value={formData.county}
-                onChange={(e) => setFormData({ ...formData, county: e.target.value })}
-                placeholder="County"
-              />
-              <input
-                className="p-2 border rounded"
-                value={formData.postcode}
-                onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
-                placeholder="Postcode"
-              />
-              <textarea
-                className="p-2 border rounded"
-                value={formData.terms}
-                onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
-                placeholder="Client Terms"
-                rows={2}
-              />
-              <div>
-                <label className="block text-gray-700 font-medium mb-1">Day Rate (£):</label>
+        <div className="fixed inset-0 z-[2000] bg-black bg-opacity-40 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
+              <h3 className="text-xl font-bold mb-4 text-indigo-600">
+                {editingClient ? "Edit Client (v2)" : "Add Client (v2)"}
+              </h3>
+              <div className="grid grid-cols-1 gap-3">
                 <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className="p-2 border rounded w-full"
-                  value={formData.dayRate}
-                  onChange={e => setFormData({ ...formData, dayRate: e.target.value })}
-                  placeholder="Day Rate"
+                  className="p-2 border rounded"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Client Name"
                 />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium mb-1">Half Day Rate (£):</label>
                 <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className="p-2 border rounded w-full"
-                  value={formData.halfDayRate}
-                  onChange={e => setFormData({ ...formData, halfDayRate: e.target.value })}
-                  placeholder="Half Day Rate"
+                  className="p-2 border rounded"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Email"
                 />
+                <input
+                  className="p-2 border rounded"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="Phone"
+                />
+                <input
+                  className="p-2 border rounded"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Address"
+                />
+                <input
+                  className="p-2 border rounded"
+                  value={formData.town}
+                  onChange={(e) => setFormData({ ...formData, town: e.target.value })}
+                  placeholder="Town"
+                />
+                <input
+                  className="p-2 border rounded"
+                  value={formData.county}
+                  onChange={(e) => setFormData({ ...formData, county: e.target.value })}
+                  placeholder="County"
+                />
+                <input
+                  className="p-2 border rounded"
+                  value={formData.postcode}
+                  onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
+                  placeholder="Postcode"
+                />
+                <textarea
+                  className="p-2 border rounded"
+                  value={formData.terms}
+                  onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+                  placeholder="Client Terms"
+                  rows={2}
+                />
+                <div>
+                  <label className="block text-gray-700 font-medium mb-1">Day Rate (£):</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="p-2 border rounded w-full"
+                    value={formData.dayRate}
+                    onChange={e => setFormData({ ...formData, dayRate: e.target.value })}
+                    placeholder="Day Rate"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-1">Half Day Rate (£):</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    className="p-2 border rounded w-full"
+                    value={formData.halfDayRate}
+                    onChange={e => setFormData({ ...formData, halfDayRate: e.target.value })}
+                    placeholder="Half Day Rate"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-4">
+                <button
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-1"
+                  onClick={handleSave}
+                >
+                  <FaPlus /> Save
+                </button>
+                <button
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded"
+                  onClick={handleCloseForm}
+                >
+                  Cancel
+                </button>
+              </div>
               <button
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded flex items-center gap-1"
-                onClick={handleSave}
-              >
-                <FaPlus /> Save
-              </button>
-              <button
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded"
+                className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 text-2xl"
                 onClick={handleCloseForm}
+                title="Close"
               >
-                Cancel
+                &times;
               </button>
             </div>
-            <button
-              className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 text-2xl"
-              onClick={handleCloseForm}
-              title="Close"
-            >
-              &times;
-            </button>
           </div>
         </div>
       )}
 
       {/* Footer matches other pages, see ![image1](image1) */}
-      <footer className="app-footer" style={{textAlign: "center", marginTop: "32px"}}>
+      <footer className="app-footer" style={{ textAlign: "center", marginTop: "32px" }}>
         <div style={{
           display: "flex",
           justifyContent: "space-between",

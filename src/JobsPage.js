@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Webcam from "react-webcam";
-import { FaPlay, FaStop, FaPlus, FaTrash, FaEdit, FaRegClock, FaCamera, FaImage, FaFileAlt, FaBars, FaTimes } from "react-icons/fa";
+import { FaPlay, FaStop, FaPlus, FaTrash, FaEdit, FaBriefcase, FaCamera, FaImage, FaFileAlt, FaBars, FaTimes, FaArchive, FaBoxOpen, FaMicrophone } from "react-icons/fa";
+import VoiceInput from "./components/VoiceInput";
 import { uploadJobPhoto, fetchJobPhotos, deleteJobPhoto } from "./jobPhotoService";
 import { auth } from "./firebase";
 
@@ -32,6 +33,9 @@ export default function JobsPage({
   handleAddJob,
   deleteSession,
   deleteJob,
+  archiveJob,
+  dayItems = [],
+  deleteDayItem,
   // Remove setActiveView, use navigate instead
 }) {
   const navigate = useNavigate();
@@ -43,6 +47,7 @@ export default function JobsPage({
   const [photoDate, setPhotoDate] = useState("");
   const [photoFile, setPhotoFile] = useState(null);
   const [showWebcam, setShowWebcam] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
   // Report modal state
   // PDF Export for Job Photo Report
@@ -150,7 +155,8 @@ export default function JobsPage({
   const [manualJobId, setManualJobId] = useState("");
   const [manual, setManual] = useState({
     startTime: "",
-    endTime: ""
+    endTime: "",
+    description: ""
   });
 
   // Show/hide sessions per job
@@ -164,7 +170,15 @@ export default function JobsPage({
   const [newJob, setNewJob] = useState({ name: "", rate: "", clientId: "" });
 
   // Group jobs by client, only include clients with jobs
-  const sortedJobs = [...jobs].sort((a, b) => a.name.localeCompare(b.name));
+  const visibleJobs = jobs.filter(j => {
+    const client = clients.find(c => c.id === j.clientId);
+    const isClientArchived = client?.isArchived;
+    if (showArchived) {
+      return j.isArchived || isClientArchived;
+    }
+    return !j.isArchived && !isClientArchived;
+  });
+  const sortedJobs = [...visibleJobs].sort((a, b) => a.name.localeCompare(b.name));
   const jobsByClient = clients
     .map(client => ({
       ...client,
@@ -194,8 +208,8 @@ export default function JobsPage({
     const startTime = new Date(manual.startTime).getTime();
     const endTime = new Date(manual.endTime).getTime();
     const duration = Math.ceil((endTime - startTime) / 60000 / 15) * 15 * 60000;
-    handleManualEntry(manualJobId, { startTime, endTime, duration });
-    setManual({ startTime: "", endTime: "" });
+    handleManualEntry(manualJobId, { startTime, endTime, duration, description: manual.description });
+    setManual({ startTime: "", endTime: "", description: "" });
     setManualJobId("");
     setShowManual(false);
   };
@@ -293,51 +307,62 @@ export default function JobsPage({
 
   // Dropdown menu state
   const [menuOpen, setMenuOpen] = useState(false);
-  const isModalOpen = showPhotoModal || showAddJob || showManual || showReportModal;
-
   // Consistent button and card styles
   const cardClass = "app-card mb-4 rounded-lg shadow-sm bg-white p-2";
   const buttonClass = "app-add-btn flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-white bg-blue-600 hover:bg-blue-700 transition";
 
+  const isModalOpen = showPhotoModal || showAddJob || showManual || showReportModal;
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
+    }
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
+
   return (
-    <div className="p-2 md:p-4" style={{ minHeight: "100vh", background: "#f8f9fa" }}>
+    <div className="p-2 md:p-4" style={{ minHeight: "100vh" }}>
       {/* Mobile Dropdown Menu Button on the left */}
-      {!isModalOpen && (
-        <div style={{ position: "sticky", top: 0, zIndex: 100, background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.03)", marginBottom: 16, display: "flex", padding: "8px 12px", flexDirection: "column", alignItems: "flex-start" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <button
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              style={{ background: "none", border: "none", fontSize: 28, color: "#2563eb", cursor: "pointer", marginRight: 12 }}
-              onClick={() => setMenuOpen(m => !m)}
-            >
-              {menuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            <span className="font-bold text-blue-800 text-lg">Jobs</span>
-          </div>
-          {/* Dropdown menu content - now directly under the button */}
-          {menuOpen && (
-            <div style={{ marginTop: 4, background: "#fff", border: "1px solid #eee", boxShadow: "0 2px 8px rgba(0,0,0,0.08)", borderRadius: 8, padding: "8px 0", minWidth: 180 }}>
-              <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                <li><button className="w-full text-left px-4 py-2 text-blue-700 font-semibold" style={{ background: "none", border: "none" }} onClick={() => { navigate("/dashboard"); setMenuOpen(false); }}>Dashboard</button></li>
-                <li><button className="w-full text-left px-4 py-2 text-blue-700 font-semibold" style={{ background: "none", border: "none" }} onClick={() => { navigate("/jobs"); setMenuOpen(false); }}>Jobs</button></li>
-                <li><button className="w-full text-left px-4 py-2 text-blue-700 font-semibold" style={{ background: "none", border: "none" }} onClick={() => { navigate("/clients"); setMenuOpen(false); }}>Clients</button></li>
-                <li><button className="w-full text-left px-4 py-2 text-blue-700 font-semibold" style={{ background: "none", border: "none" }} onClick={() => { navigate("/invoices"); setMenuOpen(false); }}>Invoices</button></li>
-                <li><button className="w-full text-left px-4 py-2 text-blue-700 font-semibold" style={{ background: "none", border: "none" }} onClick={() => { navigate("/reports"); setMenuOpen(false); }}>Reports</button></li>
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Mobile Menu Removed */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-        <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
-          <FaRegClock /> Jobs
+        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-slate-800">
+          <FaBriefcase className="text-indigo-600" /> Jobs
         </h2>
-        <button
-          className={buttonClass}
-          onClick={() => setShowAddJob(true)}
-        >
-          <FaPlus /> <span className="hidden sm:inline">Add Job</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition shadow-sm border ${showArchived ? 'bg-gray-600 text-white border-gray-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+            onClick={() => setShowArchived(!showArchived)}
+          >
+            {showArchived ? <><FaBoxOpen /> Show Active Jobs</> : <><FaArchive /> Show Archived Jobs</>}
+          </button>
+          <button
+            className={buttonClass}
+            onClick={() => setShowAddJob(true)}
+          >
+            <FaPlus /> <span className="hidden sm:inline">Add Job</span>
+          </button>
+        </div>
       </div>
       {/* Grouped by Customer (Client) */}
       {jobsByClient.length === 0 ? (
@@ -422,6 +447,14 @@ export default function JobsPage({
                                 <FaFileAlt />
                               </button>
                               <button
+                                className={`${job.isArchived ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 hover:bg-gray-500'} text-white p-2 rounded-full`}
+                                onClick={() => archiveJob && archiveJob(job.id, !job.isArchived)}
+                                title={job.isArchived ? "Unarchive Job" : "Archive Job"}
+                              >
+                                {job.isArchived ? <FaBoxOpen /> : <FaArchive />}
+                              </button>
+
+                              <button
                                 className="bg-red-300 hover:bg-red-500 text-white p-2 rounded-full"
                                 onClick={() => deleteJob(job.id)}
                                 title="Delete Job"
@@ -448,40 +481,90 @@ export default function JobsPage({
                                 if (jobSessions.length === 0)
                                   return <div className="text-gray-500 mt-1">No sessions for this job.</div>;
                                 return (
-                                  <div style={{overflowX: 'auto', width: '100%'}}>
+                                  <div style={{ overflowX: 'auto', width: '100%' }}>
                                     <table className="min-w-[340px] border text-xs mt-2 w-full">
-                                    <thead>
-                                      <tr className="bg-gray-100">
-                                        <th className="py-1 px-1 border">Start</th>
-                                        <th className="py-1 px-1 border">End</th>
-                                        <th className="py-1 px-1 border">Duration</th>
-                                        <th className="py-1 px-1 border">Delete</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {jobSessions.map(s => (
-                                        <tr key={s.id} className="hover:bg-gray-50">
-                                          <td className="py-1 px-1 border">{formatUKDate(s.startTime)}</td>
-                                          <td className="py-1 px-1 border">{formatUKDate(s.endTime)}</td>
-                                          <td className="py-1 px-1 border">{formatTime(s.duration)}</td>
-                                          <td className="py-1 px-1 border" style={{textAlign: 'center'}}>
-                                            <button
-                                              className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full flex items-center justify-center"
-                                              style={{minWidth: 32, minHeight: 32}}
-                                              onClick={() => deleteSession(s.id)}
-                                              title="Delete session"
-                                              aria-label="Delete session"
-                                            >
-                                              <FaTrash size={16} />
-                                            </button>
-                                          </td>
+                                      <thead>
+                                        <tr className="bg-gray-100">
+                                          <th className="py-1 px-1 border">Start</th>
+                                          <th className="py-1 px-1 border">End</th>
+                                          <th className="py-1 px-1 border">Duration</th>
+                                          <th className="py-1 px-1 border">Notes</th>
+                                          <th className="py-1 px-1 border">Delete</th>
                                         </tr>
-                                      ))}
-                                    </tbody>
+                                      </thead>
+                                      <tbody>
+                                        {jobSessions.map(s => (
+                                          <tr key={s.id} className="hover:bg-gray-50">
+                                            <td className="py-1 px-1 border">{formatUKDate(s.startTime)}</td>
+                                            <td className="py-1 px-1 border">{formatUKDate(s.endTime)}</td>
+                                            <td className="py-1 px-1 border">{formatTime(s.duration)}</td>
+                                            <td className="py-1 px-1 border text-[10px] italic">{s.description || '-'}</td>
+                                            <td className="py-1 px-1 border" style={{ textAlign: 'center' }}>
+                                              <button
+                                                className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full flex items-center justify-center"
+                                                style={{ minWidth: 32, minHeight: 32 }}
+                                                onClick={() => deleteSession(s.id)}
+                                                title="Delete session"
+                                                aria-label="Delete session"
+                                              >
+                                                <FaTrash size={16} />
+                                              </button>
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
                                     </table>
                                   </div>
                                 );
                               })()}
+
+                              {/* --- DAY ITEMS (Log Day / 1/2 Day) --- */}
+                              {(() => {
+                                const jobDayItems = (dayItems || [])
+                                  .filter(item => item.jobId === job.id)
+                                  .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+                                if (jobDayItems.length > 0) {
+                                  return (
+                                    <div className="mt-4">
+                                      <span className="font-medium">Day & Half-Day Logs:</span>
+                                      <div style={{ overflowX: 'auto', width: '100%' }}>
+                                        <table className="min-w-[340px] border text-xs mt-2 w-full">
+                                          <thead>
+                                            <tr className="bg-orange-50">
+                                              <th className="py-1 px-1 border">Date</th>
+                                              <th className="py-1 px-1 border">Type</th>
+                                              <th className="py-1 px-1 border">Delete</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody>
+                                            {jobDayItems.map(item => (
+                                              <tr key={item.id} className="hover:bg-gray-50">
+                                                <td className="py-1 px-1 border">{formatUKDate(item.date)}</td>
+                                                <td className="py-1 px-1 border">{item.type === 'day' ? 'Full Day' : 'Half Day'}</td>
+                                                <td className="py-1 px-1 border" style={{ textAlign: 'center' }}>
+                                                  <button
+                                                    className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full flex items-center justify-center mx-auto"
+                                                    style={{ minWidth: 32, minHeight: 32 }}
+                                                    onClick={() => deleteDayItem && deleteDayItem(item.id)}
+                                                    title="Delete log"
+                                                    aria-label="Delete log"
+                                                  >
+                                                    <FaTrash size={16} />
+                                                  </button>
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })()}
+
+                              {/* --- END DAY ITEMS --- */}
                               {/* --- PHOTO GALLERY --- */}
                               <div className="mt-4">
                                 <div className="font-medium flex items-center gap-2">
@@ -539,9 +622,9 @@ export default function JobsPage({
       )}
       {/* Add Job Modal */}
       {showAddJob && (
-        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000 }}>
-          <div className="bg-white rounded p-6 min-w-96" style={{ maxWidth: "95vw", position: 'relative', zIndex: 2001 }}>
-            <h3 className="font-bold text-lg mb-2">Add Job</h3>
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
+          <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ position: 'relative', zIndex: 2001 }}>
+            <h3 className="font-bold text-lg mb-2 text-indigo-600">Add Job (v2)</h3>
             <form onSubmit={e => { e.preventDefault(); handleJobAdd(); }}>
               <div className="mb-2">
                 <label>Job Name:</label>
@@ -569,7 +652,15 @@ export default function JobsPage({
                 <select
                   className="border rounded px-2 py-1 w-full"
                   value={newJob.clientId}
-                  onChange={e => setNewJob(j => ({ ...j, clientId: e.target.value }))}
+                  onChange={e => {
+                    const clientId = e.target.value;
+                    const client = clients.find(c => c.id === clientId);
+                    setNewJob(j => ({
+                      ...j,
+                      clientId,
+                      rate: client?.hourRate ? client.hourRate.toString() : j.rate
+                    }));
+                  }}
                   required
                 >
                   <option value="">Select Client</option>
@@ -596,9 +687,9 @@ export default function JobsPage({
       )}
       {/* Manual Entry Modal */}
       {showManual && (
-        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000 }}>
-          <div className="bg-white rounded p-6 min-w-96" style={{ maxWidth: "95vw", position: 'relative', zIndex: 2001 }}>
-            <h3 className="font-bold text-lg mb-2">Manual Session Entry</h3>
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
+          <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ position: 'relative', zIndex: 2001 }}>
+            <h3 className="font-bold text-lg mb-2 text-indigo-600">Manual Session Entry (v2)</h3>
             <form onSubmit={e => { e.preventDefault(); handleManualSave(); }}>
               <div className="mb-2">
                 <label>Start Date & Time:</label>
@@ -620,6 +711,23 @@ export default function JobsPage({
                   required
                 />
               </div>
+              <div className="mb-2">
+                <label>Description / Notes:</label>
+                <div className="relative">
+                  <textarea
+                    className="border rounded px-2 py-1 w-full pr-10"
+                    rows={2}
+                    value={manual.description}
+                    onChange={e => setManual(m => ({ ...m, description: e.target.value }))}
+                    placeholder="Describe the work..."
+                  />
+                  <div className="absolute right-1 bottom-1">
+                    <VoiceInput 
+                      onTranscription={(text) => setManual(m => ({ ...m, description: m.description ? `${m.description} ${text}` : text }))} 
+                    />
+                  </div>
+                </div>
+              </div>
               <div className="flex gap-2 mt-4">
                 <button type="submit" className="bg-blue-600 text-white px-3 py-2 rounded">
                   Save Session
@@ -638,9 +746,9 @@ export default function JobsPage({
       )}
       {/* Photo Add Modal */}
       {showPhotoModal && (
-        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{zIndex: 2000 }}>
-          <div className="bg-white rounded p-6 min-w-96" style={{ maxWidth: "95vw", position: 'relative', zIndex: 2001 }}>
-            <h3 className="font-bold text-lg mb-2">Add Job Photo</h3>
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
+          <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ position: 'relative', zIndex: 2001 }}>
+            <h3 className="font-bold text-lg mb-2 text-indigo-600">Add Job Photo (v2)</h3>
             <form onSubmit={handlePhotoAdd}>
               <div className="mb-2">
                 <label>Stage (free text):</label>
@@ -750,7 +858,7 @@ export default function JobsPage({
       {/* Photo Report Modal */}
       {showReportModal && (
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000 }}>
-          <div className="bg-white rounded p-6 min-w-96" style={{ maxWidth: "95vw", maxHeight: "90vh", overflowY: "auto", position: 'relative', zIndex: 2001 }}>
+          <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ maxHeight: "90vh", overflowY: "auto", position: 'relative', zIndex: 2001 }}>
             <h3 className="font-bold text-lg mb-2">Job Photo Report</h3>
             <div>
               {(jobPhotos[reportJobId] && jobPhotos[reportJobId].length > 0) ? (
@@ -786,7 +894,7 @@ export default function JobsPage({
         </div>
       )}
       {/* Footer */}
-      <footer className="app-footer" style={{textAlign: "center", marginTop: "32px"}}>
+      <footer className="app-footer" style={{ textAlign: "center", marginTop: "32px" }}>
         <div style={{
           display: "flex",
           justifyContent: "space-between",
