@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Webcam from "react-webcam";
-import { FaPlay, FaStop, FaPlus, FaTrash, FaEdit, FaBriefcase, FaCamera, FaImage, FaFileAlt, FaBars, FaTimes, FaArchive, FaBoxOpen, FaMicrophone } from "react-icons/fa";
+import { FaPlay, FaStop, FaPlus, FaTrash, FaEdit, FaBriefcase, FaCamera, FaImage, FaFileAlt, FaArchive, FaBoxOpen, FaMicrophone } from "react-icons/fa";
 import VoiceInput from "./components/VoiceInput";
 import { uploadJobPhoto, fetchJobPhotos, deleteJobPhoto } from "./jobPhotoService";
 import { auth } from "./firebase";
@@ -38,7 +37,6 @@ export default function JobsPage({
   deleteDayItem,
   // Remove setActiveView, use navigate instead
 }) {
-  const navigate = useNavigate();
   // Photo state per job (from Firebase)
   const [jobPhotos, setJobPhotos] = useState({});
   const [showPhotoModal, setShowPhotoModal] = useState(false);
@@ -305,8 +303,6 @@ export default function JobsPage({
     }
   }
 
-  // Dropdown menu state
-  const [menuOpen, setMenuOpen] = useState(false);
   // Consistent button and card styles
   const cardClass = "app-card mb-4 rounded-lg shadow-sm bg-white p-2";
   const buttonClass = "app-add-btn flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-white bg-blue-600 hover:bg-blue-700 transition";

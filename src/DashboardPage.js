@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  FaChartPie, FaClock, FaListAlt, FaMoneyBillWave, FaBars, FaTimes, FaPlay, FaStop, FaCalendarDay, FaCalendarCheck
+  FaChartPie, FaClock, FaListAlt, FaMoneyBillWave, FaPlay, FaStop, FaCalendarDay, FaCalendarCheck
 } from "react-icons/fa";
 import VoiceInput from "./components/VoiceInput";
 
@@ -13,23 +13,6 @@ function formatTime(ms) {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   return `${hours}h ${minutes}m`;
-}
-function getUnbilledAmount(jobs, sessions, invoices) {
-  const invoicedSessionIds = new Set();
-  invoices.forEach(inv => (inv.sessions || []).forEach(s => invoicedSessionIds.add(s.id)));
-  const unbilled = sessions.filter(s => !invoicedSessionIds.has(s.id));
-  let total = 0;
-  unbilled.forEach(s => {
-    const job = jobs.find(j => j.id === s.jobId);
-    if (job && job.hourlyRate && s.duration) {
-      total += (job.hourlyRate * s.duration) / (1000 * 60 * 60);
-    }
-  });
-  return total;
-}
-function getOverdueInvoices(invoices) {
-  const now = Date.now();
-  return invoices.filter(inv => inv.status === "sent" && inv.dueDate && new Date(inv.dueDate).getTime() < now);
 }
 
 export default function DashboardPage({

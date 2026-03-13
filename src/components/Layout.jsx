@@ -10,7 +10,6 @@ import {
     FaQuestionCircle,
     FaSignOutAlt,
     FaBars,
-    FaTimes,
     FaMoon,
     FaSun,
     FaUserShield

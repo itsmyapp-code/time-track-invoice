@@ -36,7 +36,6 @@ import AuthView from "./components/AuthView";
 import LandingPage from "./components/LandingPage";
 import Paywall from "./components/Paywall";
 import AdminPage from "./components/AdminPage";
-import { FaSignOutAlt, FaCog, FaQuestionCircle, FaUserShield } from "react-icons/fa";
 import { addOfflineAction, getOfflineActions, clearOfflineActions } from './offlineActions';
 import { usePwsReminders } from './hooks/usePwsReminders';
 // serviceWorkerRegistration.register();
@@ -230,6 +229,8 @@ const App = () => {
   const navigate = useNavigate();
   useEffect(() => {
     let unsubscribeSettings = () => { };
+    let unsubSub = () => { };
+    let unsubUserDoc = () => { };
     const unsubscribeAuth = onAuthStateChanged(auth, async user => {
       setUser(user);
       if (user) {
@@ -258,7 +259,7 @@ const App = () => {
 
           // 1. Subscription listener
           const subRef = collection(db, "users", user.uid, "subscriptions");
-          const unsubSub = onSnapshot(subRef, snap => {
+          unsubSub = onSnapshot(subRef, snap => {
             subscriptionActive = false;
             snap.forEach(doc => {
               const data = doc.data();
@@ -271,7 +272,7 @@ const App = () => {
           });
 
           // 2. Pro Override listener
-          const unsubUserDoc = onSnapshot(doc(db, "users", user.uid), userDocSnap => {
+          unsubUserDoc = onSnapshot(doc(db, "users", user.uid), userDocSnap => {
             overrideActive = false;
             if (userDocSnap.exists() && userDocSnap.data().proOverride) {
               overrideActive = true;
@@ -299,7 +300,7 @@ const App = () => {
         setIsLoadingPro(false);
       }
     });
-    return () => { unsubscribeAuth(); unsubscribeSettings(); };
+    return () => { unsubscribeAuth(); unsubscribeSettings(); unsubSub(); unsubUserDoc(); };
   }, []);
 
   const jobsWithSessions = useMemo(() =>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { FaChartBar, FaFileAlt, FaFileInvoiceDollar, FaDownload } from "react-icons/fa";
+import { FaChartBar, FaFileAlt, FaDownload } from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -55,40 +55,40 @@ export default function ReportsPage({
     );
   }, [filtersChosen, reportType, startDate, endDate, selectedClientId, jobs, sessions]);
 
-  // Helper to calculate total for a single invoice
-  const calculateInvoiceTotal = (inv) => {
-    let total = 0;
-    // Sessions
-    if (inv.sessions) {
-      inv.sessions.forEach(session => {
-        const job = jobs.find(j => j.id === session.jobId);
-        const rate = job ? parseFloat(job.hourlyRate || 0) : 0;
-        const hours = (session.duration || 0) / 3600000;
-        total += hours * rate;
-      });
-    }
-    // Manual Items
-    if (inv.manualItems) {
-      inv.manualItems.forEach(item => {
-        total += parseFloat(item.amount || 0);
-      });
-    }
-    // Day Items
-    if (inv.dayItems) {
-      const client = clients.find(c => c.id === inv.clientId);
-      const dayRate = client ? parseFloat(client.dayRate || 0) : 0;
-      const halfDayRate = client ? parseFloat(client.halfDayRate || 0) : 0;
-
-      inv.dayItems.forEach(item => {
-        const rate = item.type === "day" ? dayRate : halfDayRate;
-        total += rate;
-      });
-    }
-    return total;
-  };
-
   // Compute filteredInvoices with calculated totals
   const filteredInvoices = useMemo(() => {
+    // Helper to calculate total for a single invoice
+    const calculateInvoiceTotal = (inv) => {
+      let total = 0;
+      // Sessions
+      if (inv.sessions) {
+        inv.sessions.forEach(session => {
+          const job = jobs.find(j => j.id === session.jobId);
+          const rate = job ? parseFloat(job.hourlyRate || 0) : 0;
+          const hours = (session.duration || 0) / 3600000;
+          total += hours * rate;
+        });
+      }
+      // Manual Items
+      if (inv.manualItems) {
+        inv.manualItems.forEach(item => {
+          total += parseFloat(item.amount || 0);
+        });
+      }
+      // Day Items
+      if (inv.dayItems) {
+        const client = clients.find(c => c.id === inv.clientId);
+        const dayRate = client ? parseFloat(client.dayRate || 0) : 0;
+        const halfDayRate = client ? parseFloat(client.halfDayRate || 0) : 0;
+
+        inv.dayItems.forEach(item => {
+          const rate = item.type === "day" ? dayRate : halfDayRate;
+          total += rate;
+        });
+      }
+      return total;
+    };
+
     if (!filtersChosen || reportType !== "invoices" || !invoices) return [];
 
     const startDateObj = new Date(startDate);
@@ -246,8 +246,6 @@ export default function ReportsPage({
     const logoImg2 = new window.Image();
     logoImg2.src = `/logo.png?v=${new Date().getTime()}`;
 
-    let logo1Loaded = false;
-    let logo2Loaded = false;
 
     const generateContent = () => {
       // Title
@@ -337,13 +335,9 @@ export default function ReportsPage({
 
 
     const checkImages = () => {
-      if (logoImg1.complete) logo1Loaded = true;
-      if (logoImg2.complete) logo2Loaded = true;
       setTimeout(() => { generateContent(); }, 500);
     }
 
-    logoImg1.onload = () => { logo1Loaded = true; };
-    logoImg2.onload = () => { logo2Loaded = true; };
     checkImages();
   }
 

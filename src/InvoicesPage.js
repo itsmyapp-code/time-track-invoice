@@ -27,7 +27,6 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
     return due < now;
   }
   // Dropdown menu state
-  const [menuOpen, setMenuOpen] = useState(false); // Removed but keeping var if needed to avoid break, but actually better to remove. 
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
     id: null,

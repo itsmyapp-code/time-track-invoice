@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import { FaLock, FaEnvelope } from "react-icons/fa";
 
 export default function AuthView({
     handleLogin,
