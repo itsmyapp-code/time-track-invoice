@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Webcam from "react-webcam";
-import { FaPlay, FaStop, FaPlus, FaTrash, FaEdit, FaBriefcase, FaCamera, FaImage, FaFileAlt, FaArchive, FaBoxOpen, FaMicrophone } from "react-icons/fa";
+import { FaPlay, FaStop, FaPlus, FaTrash, FaEdit, FaBriefcase, FaCamera, FaImage, FaFileAlt, FaArchive, FaBoxOpen } from "react-icons/fa";
 import VoiceInput from "./components/VoiceInput";
 import { uploadJobPhoto, fetchJobPhotos, deleteJobPhoto } from "./jobPhotoService";
 import { auth } from "./firebase";
@@ -30,6 +30,7 @@ export default function JobsPage({
   handleManualEntry,
   sessions,
   handleAddJob,
+  editJob,
   deleteSession,
   deleteJob,
   archiveJob,
@@ -167,6 +168,22 @@ export default function JobsPage({
   const [showAddJob, setShowAddJob] = useState(false);
   const [newJob, setNewJob] = useState({ name: "", rate: "", clientId: "" });
 
+  // Edit Job Modal
+  const [showEditJob, setShowEditJob] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
+  const [editJobForm, setEditJobForm] = useState({ name: "", rate: "", clientId: "" });
+
+  const handleJobEditSave = () => {
+    if (!editJobForm.name || !editJobForm.rate || !editJobForm.clientId || !editingJob) return;
+    editJob(editingJob.id, {
+      name: editJobForm.name,
+      rate: parseFloat(editJobForm.rate),
+      clientId: editJobForm.clientId
+    });
+    setEditingJob(null);
+    setShowEditJob(false);
+  };
+
   // Group jobs by client, only include clients with jobs
   const visibleJobs = jobs.filter(j => {
     const client = clients.find(c => c.id === j.clientId);
@@ -203,9 +220,23 @@ export default function JobsPage({
   // Manual Entry handler
   const handleManualSave = () => {
     if (!manual.startTime || !manual.endTime || !manualJobId) return;
-    const startTime = new Date(manual.startTime).getTime();
-    const endTime = new Date(manual.endTime).getTime();
+    
+    let startD = new Date(manual.startTime);
+    let endD = new Date(manual.endTime);
+    
+    // Fix 2-digit years (e.g. typing '26' becomes '0026')
+    if (startD.getFullYear() < 100) startD.setFullYear(startD.getFullYear() + 2000);
+    if (endD.getFullYear() < 100) endD.setFullYear(endD.getFullYear() + 2000);
+
+    const startTime = startD.getTime();
+    const endTime = endD.getTime();
     const duration = Math.ceil((endTime - startTime) / 60000 / 15) * 15 * 60000;
+    
+    if (duration < 0) {
+      alert("End time cannot be before start time.");
+      return;
+    }
+
     handleManualEntry(manualJobId, { startTime, endTime, duration, description: manual.description });
     setManual({ startTime: "", endTime: "", description: "" });
     setManualJobId("");
@@ -307,7 +338,7 @@ export default function JobsPage({
   const cardClass = "app-card mb-4 rounded-lg shadow-sm bg-white p-2";
   const buttonClass = "app-add-btn flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-white bg-blue-600 hover:bg-blue-700 transition";
 
-  const isModalOpen = showPhotoModal || showAddJob || showManual || showReportModal;
+  const isModalOpen = showPhotoModal || showAddJob || showManual || showReportModal || showEditJob;
 
   useEffect(() => {
     if (isModalOpen) {
@@ -380,7 +411,9 @@ export default function JobsPage({
                       {client.jobs.map(job => (
                         <div key={job.id} className={cardClass}>
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                            <div className="font-semibold text-base mb-2 sm:mb-0">{job.name}</div>
+                            <div className="font-semibold text-base mb-2 sm:mb-0">
+                              {job.name} <span className="text-gray-500 font-normal text-sm ml-2">(£{Number(job.hourlyRate || 0).toFixed(2)}/hr)</span>
+                            </div>
                             <div className="flex flex-wrap gap-2">
                               {/* Timer controls */}
                               {!getRunningSession(job.id) ? (
@@ -450,6 +483,17 @@ export default function JobsPage({
                                 {job.isArchived ? <FaBoxOpen /> : <FaArchive />}
                               </button>
 
+                              <button
+                                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full"
+                                onClick={() => {
+                                  setEditingJob(job);
+                                  setEditJobForm({ name: job.name, rate: job.hourlyRate ? job.hourlyRate.toString() : "", clientId: job.clientId });
+                                  setShowEditJob(true);
+                                }}
+                                title="Edit Job"
+                              >
+                                <FaEdit />
+                              </button>
                               <button
                                 className="bg-red-300 hover:bg-red-500 text-white p-2 rounded-full"
                                 onClick={() => deleteJob(job.id)}
@@ -623,27 +667,6 @@ export default function JobsPage({
             <h3 className="font-bold text-lg mb-2 text-indigo-600">Add Job (v2)</h3>
             <form onSubmit={e => { e.preventDefault(); handleJobAdd(); }}>
               <div className="mb-2">
-                <label>Job Name:</label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  value={newJob.name}
-                  onChange={e => setNewJob(j => ({ ...j, name: e.target.value }))}
-                  required
-                />
-              </div>
-              <div className="mb-2">
-                <label>Hourly Rate (£):</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  className="border rounded px-2 py-1 w-full"
-                  value={newJob.rate}
-                  onChange={e => setNewJob(j => ({ ...j, rate: e.target.value }))}
-                  required
-                />
-              </div>
-              <div className="mb-2">
                 <label>Client:</label>
                 <select
                   className="border rounded px-2 py-1 w-full"
@@ -665,6 +688,27 @@ export default function JobsPage({
                   ))}
                 </select>
               </div>
+              <div className="mb-2">
+                <label>Job Name:</label>
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  value={newJob.name}
+                  onChange={e => setNewJob(j => ({ ...j, name: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="mb-2">
+                <label>Hourly Rate (£):</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="border rounded px-2 py-1 w-full"
+                  value={newJob.rate}
+                  onChange={e => setNewJob(j => ({ ...j, rate: e.target.value }))}
+                  required
+                />
+              </div>
               <div className="flex gap-2 mt-4">
                 <button type="submit" className="bg-blue-600 text-white px-3 py-2 rounded">
                   Save Job
@@ -673,6 +717,63 @@ export default function JobsPage({
                   type="button"
                   className="bg-gray-300 text-gray-700 px-3 py-2 rounded"
                   onClick={() => setShowAddJob(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Edit Job Modal */}
+      {showEditJob && (
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
+          <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ position: 'relative', zIndex: 2001 }}>
+            <h3 className="font-bold text-lg mb-2 text-indigo-600">Edit Job</h3>
+            <form onSubmit={e => { e.preventDefault(); handleJobEditSave(); }}>
+              <div className="mb-2">
+                <label>Client:</label>
+                <select
+                  className="border rounded px-2 py-1 w-full"
+                  value={editJobForm.clientId}
+                  onChange={e => setEditJobForm(j => ({ ...j, clientId: e.target.value }))}
+                  required
+                >
+                  <option value="">Select Client</option>
+                  {clients.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-2">
+                <label>Job Name:</label>
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  value={editJobForm.name}
+                  onChange={e => setEditJobForm(j => ({ ...j, name: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="mb-2">
+                <label>Hourly Rate (£):</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="border rounded px-2 py-1 w-full"
+                  value={editJobForm.rate}
+                  onChange={e => setEditJobForm(j => ({ ...j, rate: e.target.value }))}
+                  required
+                />
+              </div>
+              <div className="flex gap-2 mt-4">
+                <button type="submit" className="bg-blue-600 text-white px-3 py-2 rounded">
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  className="bg-gray-300 text-gray-700 px-3 py-2 rounded"
+                  onClick={() => setShowEditJob(false)}
                 >
                   Cancel
                 </button>

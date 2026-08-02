@@ -195,6 +195,19 @@ const App = () => {
             }
             if (action.type === 'editClient') {
               await setDoc(doc(db, "users", user.uid, "clients", action.clientId), action.client, { merge: true });
+              const jobsRef = collection(db, "users", user.uid, "jobs");
+              const q = query(jobsRef, where("clientId", "==", action.clientId));
+              const snapshot = await getDocs(q);
+              for (const docSnap of snapshot.docs) {
+                await updateDoc(doc(db, "users", user.uid, "jobs", docSnap.id), { hourlyRate: action.client.hourRate });
+              }
+            }
+            if (action.type === 'editJob') {
+              await updateDoc(doc(db, "users", user.uid, "jobs", action.jobId), {
+                name: action.job.name,
+                hourlyRate: action.job.rate,
+                clientId: action.job.clientId
+              });
             }
             if (action.type === 'saveInvoice') {
               await addDoc(collection(db, "users", user.uid, "invoices"), action.invoiceData);
@@ -225,6 +238,30 @@ const App = () => {
       })();
     }
   }, [isOnline, user]);
+
+  // Data migration / fix for bad session dates (e.g. year 0026 bug)
+  useEffect(() => {
+    if (user && isOnline && sessions.length > 0) {
+      sessions.forEach(async (s) => {
+        // If duration is more than 100 years
+        if (s.duration > 1000 * 60 * 60 * 24 * 365 * 100) {
+          const startDate = new Date(s.startTime);
+          if (startDate.getFullYear() < 100) {
+            startDate.setFullYear(startDate.getFullYear() + 2000);
+            const newStartTime = startDate.getTime();
+            const newDuration = Math.ceil((s.endTime - newStartTime) / 60000 / 15) * 15 * 60000;
+            if (newDuration >= 0) {
+              try {
+                await setDoc(doc(db, "users", user.uid, "sessions", s.id), { startTime: newStartTime, duration: newDuration }, { merge: true });
+              } catch (e) {
+                console.error("Failed to fix session", e);
+              }
+            }
+          }
+        }
+      });
+    }
+  }, [user, isOnline, sessions]);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -442,16 +479,44 @@ const App = () => {
     }
   }, [user, isOnline]);
 
-  const editClient = useCallback(async (clientId, client) => {
+  const editClient = useCallback(async (clientId, clientData) => {
     if (user) {
       if (!isOnline) {
-        await addOfflineAction({ type: 'editClient', clientId, client });
+        await addOfflineAction({ type: 'editClient', clientId, client: clientData });
         return;
       }
       try {
-        await setDoc(doc(db, "users", user.uid, "clients", clientId), client, { merge: true });
+        const existingClient = clients.find(c => c.id === clientId);
+        const rateChanged = existingClient && existingClient.hourRate !== clientData.hourRate;
+
+        await setDoc(doc(db, "users", user.uid, "clients", clientId), clientData, { merge: true });
+
+        if (rateChanged) {
+          const clientJobs = jobs.filter(j => j.clientId === clientId);
+          for (const job of clientJobs) {
+            await updateDoc(doc(db, "users", user.uid, "jobs", job.id), { hourlyRate: clientData.hourRate });
+          }
+        }
       } catch (error) {
         console.error("Edit client error:", error);
+      }
+    }
+  }, [user, isOnline, clients, jobs]);
+
+  const editJob = useCallback(async (jobId, jobData) => {
+    if (user) {
+      if (!isOnline) {
+        await addOfflineAction({ type: 'editJob', jobId, job: jobData });
+        return;
+      }
+      try {
+        await updateDoc(doc(db, "users", user.uid, "jobs", jobId), {
+          name: jobData.name,
+          hourlyRate: jobData.rate,
+          clientId: jobData.clientId
+        });
+      } catch (error) {
+        console.error("Edit job error:", error);
       }
     }
   }, [user, isOnline]);
@@ -665,6 +730,7 @@ const App = () => {
                     handleManualEntry={handleManualEntry}
                     sessions={sessions}
                     handleAddJob={handleAddJob}
+                    editJob={editJob}
                     deleteSession={deleteSession}
                     deleteJob={deleteJob}
                     archiveJob={archiveJob}
