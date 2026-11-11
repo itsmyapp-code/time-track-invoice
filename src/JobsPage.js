@@ -567,7 +567,7 @@ export default function JobsPage({
                                 if (jobDayItems.length > 0) {
                                   return (
                                     <div className="mt-4">
-                                      <span className="font-medium">Day & Half-Day Logs:</span>
+                                      <span className="font-medium">Day / Half-Day / Mileage Logs:</span>
                                       <div style={{ overflowX: 'auto', width: '100%' }}>
                                         <table className="min-w-[340px] border text-xs mt-2 w-full">
                                           <thead>
@@ -581,7 +581,7 @@ export default function JobsPage({
                                             {jobDayItems.map(item => (
                                               <tr key={item.id} className="hover:bg-gray-50">
                                                 <td className="py-1 px-1 border">{formatUKDate(item.date)}</td>
-                                                <td className="py-1 px-1 border">{item.type === 'day' ? 'Full Day' : 'Half Day'}</td>
+                                                <td className="py-1 px-1 border">{item.type === 'day' ? 'Full Day' : item.type === 'halfDay' ? 'Half Day' : `Mileage (${item.miles || 0} mi)`}</td>
                                                 <td className="py-1 px-1 border" style={{ textAlign: 'center' }}>
                                                   <button
                                                     className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full flex items-center justify-center mx-auto"

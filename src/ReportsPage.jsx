@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { FaChartBar, FaFileAlt, FaDownload } from "react-icons/fa";
+import { FaChartBar, FaDownload } from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -64,7 +64,7 @@ export default function ReportsPage({
       if (inv.sessions) {
         inv.sessions.forEach(session => {
           const job = jobs.find(j => j.id === session.jobId);
-          const rate = job ? parseFloat(job.hourlyRate || 0) : 0;
+          const rate = session.hourlyRate ?? (job ? parseFloat(job.hourlyRate || 0) : 0);
           const hours = (session.duration || 0) / 3600000;
           total += hours * rate;
         });
@@ -82,7 +82,7 @@ export default function ReportsPage({
         const halfDayRate = client ? parseFloat(client.halfDayRate || 0) : 0;
 
         inv.dayItems.forEach(item => {
-          const rate = item.type === "day" ? dayRate : halfDayRate;
+          const rate = item.rate ?? (item.type === "day" ? dayRate : halfDayRate);
           total += rate;
         });
       }
@@ -188,13 +188,13 @@ export default function ReportsPage({
     // Table
     const sessionRows = (invoice.sessions || []).map(s => {
       const job = jobs.find(j => j.id === s.jobId);
-      const rate = job?.hourlyRate || 0;
+      const rate = s.hourlyRate ?? job?.hourlyRate ?? 0;
       const hours = ((s.duration || 0) / 3600000).toFixed(2);
       return [job?.name || "Job", formatUKDate(s.startTime), hours, rate.toFixed(2), (hours * rate).toFixed(2)];
     });
 
     const dayRows = (invoice.dayItems || []).map(item => {
-      const rate = item.type === "day" ? (client.dayRate || 0) : (client.halfDayRate || 0);
+      const rate = item.rate ?? (item.type === "day" ? (client.dayRate || 0) : (client.halfDayRate || 0));
       return [item.type === "day" ? "Day Rate" : "Half Day Rate", formatUKDate(item.date), item.type === "day" ? "1.00" : "0.50", rate.toFixed(2), Number(rate).toFixed(2)];
     });
 

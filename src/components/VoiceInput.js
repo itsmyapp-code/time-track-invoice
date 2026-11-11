@@ -9,7 +9,14 @@ import { FaMicrophone } from 'react-icons/fa';
 const VoiceInput = ({ onTranscription, className = "" }) => {
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
-  const [silenceTimer, setSilenceTimer] = useState(null);
+  
+  // Use refs to keep track of values without triggering re-runs of useEffect
+  const onTranscriptionRef = React.useRef(onTranscription);
+  const silenceTimerRef = React.useRef(null);
+
+  useEffect(() => {
+    onTranscriptionRef.current = onTranscription;
+  }, [onTranscription]);
 
   useEffect(() => {
     // browser-native Web Speech API
@@ -23,7 +30,7 @@ const VoiceInput = ({ onTranscription, className = "" }) => {
 
       recog.onresult = (event) => {
         // Clear silence timer on every result
-        if (silenceTimer) clearTimeout(silenceTimer);
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
 
         let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -33,36 +40,51 @@ const VoiceInput = ({ onTranscription, className = "" }) => {
         }
 
         if (finalTranscript) {
-          onTranscription(finalTranscript);
+          // Use ref to call the latest callback
+          onTranscriptionRef.current(finalTranscript.trim());
         }
 
-        // Set silence timer to stop after 2 seconds of inactivity
-        const timer = setTimeout(() => {
+        // Set silence timer to stop after 2.5 seconds of inactivity
+        silenceTimerRef.current = setTimeout(() => {
           recog.stop();
-        }, 2000);
-        setSilenceTimer(timer);
+        }, 2500);
       };
 
-      recog.onstart = () => setIsListening(true);
+      recog.onstart = () => {
+        setIsListening(true);
+      };
+
       recog.onend = () => {
         setIsListening(false);
-        if (silenceTimer) clearTimeout(silenceTimer);
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       };
+
       recog.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
+        if (event.error !== 'no-speech') {
+          console.error("Speech recognition error:", event.error);
+        }
         setIsListening(false);
       };
 
       setRecognition(recog);
+
+      return () => {
+        recog.stop();
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      };
     }
-  }, [onTranscription, silenceTimer]);
+  }, []); // Only run once on mount
 
   const toggleListening = useCallback(() => {
     if (isListening) {
-      recognition.stop();
+      if (recognition) recognition.stop();
     } else {
       if (recognition) {
-        recognition.start();
+        try {
+          recognition.start();
+        } catch (e) {
+          console.warn("Recognition already started or error:", e);
+        }
       } else {
         alert("Speech Recognition is not supported in this browser.");
       }
@@ -80,7 +102,7 @@ const VoiceInput = ({ onTranscription, className = "" }) => {
           ? 'bg-red-500 text-white animate-pulse scale-110 shadow-lg' 
           : 'bg-indigo-100 text-indigo-600 hover:bg-indigo-200'
       } ${className}`}
-      title={isListening ? "Listening (stop after 2s of silence)..." : "Start Voice Input"}
+      title={isListening ? "Listening (stop after 2.5s of silence)..." : "Start Voice Input"}
     >
       <FaMicrophone size={18} />
     </button>

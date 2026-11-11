@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaClock, FaFileInvoiceDollar, FaChartLine, FaMobileAlt, FaCloudUploadAlt, FaLock } from "react-icons/fa";
+import GlobalFooter from "./GlobalFooter";
 
 export default function LandingPage() {
     const [showTerms, setShowTerms] = useState(false);
@@ -117,28 +118,8 @@ export default function LandingPage() {
                 </div>
             </main>
 
-            {/* Footer */}
-            <footer className="border-t border-slate-800 bg-slate-950 py-12 relative z-10">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-                    <div className="flex justify-center items-center gap-4 mb-6">
-                        <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain transition-all" />
-                        <img src="/itsmyapp_logo.png" alt="ItsMyApp" className="h-8 w-auto object-contain transition-all" />
-                    </div>
-
-                    <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-400 mb-8 z-20">
-                        <button type="button" onClick={() => setShowTerms(true)} className="hover:text-white transition-colors cursor-pointer relative z-50">Terms & Conditions</button>
-                        <span>•</span>
-                        <button type="button" onClick={() => setShowPrivacy(true)} className="hover:text-white transition-colors cursor-pointer relative z-50">Privacy Policy</button>
-                        <span>•</span>
-                        <button type="button" onClick={() => setShowCookie(true)} className="hover:text-white transition-colors cursor-pointer relative z-50">Cookie Policy</button>
-                    </div>
-
-                    <p className="text-slate-500 text-sm text-center">
-                        Powered by Time Track Invoice © {new Date().getFullYear()} ItsMyApp.co.uk<br />
-                        All rights reserved | <a href="mailto:hello@itsmyapp.co.uk" className="hover:text-white transition-colors relative z-50">hello@itsmyapp.co.uk</a>
-                    </p>
-                </div>
-            </footer>
+            {/* Global Legal Compliance Footer */}
+            <GlobalFooter theme="dark" />
 
             {/* Modals */}
             {shouldShowModal(showTerms, setShowTerms, "Terms of Service", (

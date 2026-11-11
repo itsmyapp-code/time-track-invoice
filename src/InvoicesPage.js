@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaPrint, FaCheck, FaEnvelope, FaTrash, FaFileInvoiceDollar, FaPlus, FaEdit } from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { ITSMYAPP_BANNER_BASE64 } from "./assets/bannerBase64";
 
 const APP_VERSION = "v1.0.0";
 
@@ -33,7 +34,8 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
     clientId: "",
     startDate: "",
     endDate: "",
-    dueDate: ""
+    dueDate: "",
+    mileageOverride: null
   });
 
   const [manualItems, setManualItems] = useState([]);
@@ -110,8 +112,26 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
 
   const handleSaveInvoice = () => {
     // If editing, we use existing data, else create new
-    const invoiceSessions = getInvoiceSessions();
-    const invoiceDayItems = getInvoiceDayItems();
+    const client = getClient(form.clientId);
+    const invoiceSessions = getInvoiceSessions().map(s => {
+      const job = jobs.find(j => j.id === s.jobId);
+      return {
+        ...s,
+        hourlyRate: job?.hourlyRate ?? client?.hourRate ?? 0
+      };
+    });
+    const invoiceDayItems = getInvoiceDayItems().map(item => {
+      let rate = 0;
+      if (item.type === "day") rate = client?.dayRate ?? 0;
+      else if (item.type === "halfDay") rate = client?.halfDayRate ?? 0;
+      else if (item.type === "mileage") rate = settings?.mileageRate ? parseFloat(settings.mileageRate) : 0;
+      
+      return {
+        ...item,
+        rate
+      };
+    });
+
     if (!form.clientId || !form.startDate || !form.endDate) {
       // If editing and we have manual items, it's fine.
       if (manualItems.length === 0 && dayItems.length === 0 && invoiceSessions.length === 0 && invoiceDayItems.length === 0) {
@@ -119,7 +139,6 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
         return;
       }
     }
-    const client = getClient(form.clientId);
 
     let invoiceNumber = form.invoiceNumber;
     let createdAt = form.createdAt || Date.now();
@@ -138,6 +157,29 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
       invoiceNumber = `${yyyymmdd}-${sequence}`;
     }
 
+    const savedSessions = (form.sessions || []).map(s => {
+      if (s.hourlyRate !== undefined) return s;
+      const job = jobs.find(j => j.id === s.jobId);
+      return {
+        ...s,
+        hourlyRate: job?.hourlyRate ?? client?.hourRate ?? 0
+      };
+    });
+
+    const savedDayItems = (form.id ? dayItems : []).map(item => {
+      if (item.rate !== undefined) return item;
+      
+      let rate = 0;
+      if (item.type === "day") rate = client?.dayRate ?? 0;
+      else if (item.type === "halfDay") rate = client?.halfDayRate ?? 0;
+      else if (item.type === "mileage") rate = settings?.mileageRate ? parseFloat(settings.mileageRate) : 0;
+
+      return {
+        ...item,
+        rate
+      };
+    });
+
     const invoiceData = {
       ...form, // preserves ID if exists
       invoiceNumber,
@@ -152,9 +194,11 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
       startDate: form.startDate,
       endDate: form.endDate,
       dueDate: form.dueDate,
-      sessions: invoiceSessions.length > 0 ? invoiceSessions : (form.sessions || []), // Use new sessions if found, else keep old
+      sessions: invoiceSessions.length > 0 ? invoiceSessions : savedSessions,
       manualItems: manualItems.filter(item => item.description && item.amount),
-      dayItems: invoiceDayItems.length > 0 ? invoiceDayItems : (form.id ? dayItems : []),
+      dayItems: invoiceDayItems.length > 0 ? invoiceDayItems : savedDayItems,
+      mileageOverride: form.mileageOverride !== undefined ? form.mileageOverride : null,
+      mileageRate: parseFloat(settings?.mileageRate || 0),
       status: status,
       createdAt: createdAt
     };
@@ -180,7 +224,7 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
     setShowModal(false);
     setManualItems([]);
     setDayItems([]);
-    setForm({ id: null, clientId: "", startDate: "", endDate: "", dueDate: "" });
+    setForm({ id: null, clientId: "", startDate: "", endDate: "", dueDate: "", mileageOverride: null });
   };
 
   const handleEditInvoice = (inv) => {
@@ -193,16 +237,14 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
       dueDate: inv.dueDate,
       status: inv.status,
       createdAt: inv.createdAt,
-      sessions: inv.sessions
+      sessions: inv.sessions,
+      mileageOverride: inv.mileageOverride !== undefined ? inv.mileageOverride : null
     });
     setManualItems(inv.manualItems || []);
     setDayItems(inv.dayItems || []);
     setShowModal(true);
   };
 
-  const handleMarkSent = (invoiceId) => {
-    if (updateInvoiceStatus) updateInvoiceStatus(invoiceId, "sent");
-  };
   const handleMarkPaid = (invoiceId) => {
     if (updateInvoiceStatus) updateInvoiceStatus(invoiceId, "paid");
   };
@@ -275,7 +317,7 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
     const sessionRows = (invoice.sessions || []).map(s => {
       const job = jobs.find(j => j.id === s.jobId);
       const jobName = job?.name || "N/A";
-      const rate = job?.hourlyRate || 0;
+      const rate = s.hourlyRate ?? job?.hourlyRate ?? 0;
       const hours = ((s.duration || 0) / (1000 * 60 * 60)).toFixed(2);
       const amount = (parseFloat(hours) * parseFloat(rate)).toFixed(2);
       return [
@@ -287,9 +329,9 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
       ];
     });
     const client = getClient(invoice.clientId) || {};
-    const dayRows = (invoice.dayItems || []).map(item => {
+    const regularDayRows = (invoice.dayItems || []).filter(item => item.type !== 'mileage').map(item => {
       const typeLabel = item.type === "day" ? "Day Rate" : "Half Day Rate";
-      const rateVal = item.type === "day" ? client.dayRate : client.halfDayRate;
+      const rateVal = item.rate ?? (item.type === "day" ? client.dayRate : client.halfDayRate);
       const hoursVal = item.type === "day" ? "1.00" : "0.50";
       return [
         typeLabel,
@@ -299,6 +341,32 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
         rateVal.toFixed(2)
       ];
     });
+
+    const mileageItems = (invoice.dayItems || []).filter(item => item.type === 'mileage');
+    let totalMiles = 0;
+    let hasMileage = false;
+
+    if (invoice.mileageOverride !== undefined && invoice.mileageOverride !== null) {
+      totalMiles = parseFloat(invoice.mileageOverride);
+      hasMileage = true;
+    } else if (mileageItems.length > 0) {
+      totalMiles = mileageItems.reduce((sum, item) => sum + (parseFloat(item.miles) || 0), 0);
+      hasMileage = true;
+    }
+
+    let mileageRow = [];
+    if (hasMileage && totalMiles > 0) {
+      const rateVal = invoice.mileageRate !== undefined ? parseFloat(invoice.mileageRate) : parseFloat(settings?.mileageRate || 0);
+      const amount = (totalMiles * rateVal).toFixed(2);
+      mileageRow = [[
+        `Total Mileage (${totalMiles} mi)`,
+        "",
+        totalMiles.toString(),
+        rateVal.toFixed(2),
+        amount
+      ]];
+    }
+
     const manualRows = (invoice.manualItems || []).map(item => [
       item.description,
       "",
@@ -308,60 +376,114 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
     ]);
     const allRows = [
       ...sessionRows,
-      ...dayRows,
+      ...regularDayRows,
+      ...mileageRow,
       ...manualRows
     ];
     autoTable(doc, {
       startY: headerEndY,
-      head: [["Description", "Date", "Hours", "Rate (£)", "Amount (£)"]],
+      margin: { left: 40, right: 40, bottom: 90 },
+      head: [["Description", "Date", "Qty/Hrs", "Rate (£)", "Amount (£)"]],
       body: allRows,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [33, 64, 154] },
       theme: "grid"
     });
 
-    // Use a new variable for y after the table
-    let yAfterTable = doc.lastAutoTable.finalY + 20;
+    // Content boundary and positioning
+    const pageHeight = doc.internal.pageSize.getHeight();
+    // Leave safe space above footer (banner ~50pt + copyright line + margins)
+    const contentMaxY = pageHeight - 90;
 
-    // --- After table content ---
+    let currentY = doc.lastAutoTable.finalY + 18;
+
+    // Check if Total fits on the page
+    if (currentY + 20 > contentMaxY) {
+      doc.addPage();
+      currentY = 40;
+    }
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
     const totalAmount = allRows.reduce((sum, row) => sum + parseFloat(row[4] || 0), 0);
-    doc.text(`Total: £${totalAmount.toFixed(2)}`, 400, yAfterTable);
-    yAfterTable += 20;
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Thank you for your business, ${settings.ownerName || ""}`, 40, yAfterTable);
-    yAfterTable += 25;
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("Terms and Conditions:", 40, yAfterTable);
-    yAfterTable += 15;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    const terms = settings.termsConditions || "No terms and conditions set.";
-    doc.text(terms, 40, yAfterTable, { maxWidth: 500 });
-    const termsLines = doc.splitTextToSize(terms, 500).length;
-    yAfterTable += termsLines * 13;
-    const pageHeight = doc.internal.pageSize.getHeight();
-    if (yAfterTable + 170 > pageHeight) {
+    doc.text(`Total: £${totalAmount.toFixed(2)}`, 400, currentY);
+    currentY += 20;
+
+    // Thank you note
+    if (currentY + 16 > contentMaxY) {
       doc.addPage();
-      yAfterTable = 40;
+      currentY = 40;
+    }
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Thank you for your business, ${settings.ownerName || ""}`, 40, currentY);
+    currentY += 22;
+
+    // Terms and Conditions with safe line-by-line pagination
+    const terms = settings.termsConditions;
+    if (terms && terms.trim()) {
+      if (currentY + 25 > contentMaxY) {
+        doc.addPage();
+        currentY = 40;
+      }
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.text("Terms and Conditions:", 40, currentY);
+      currentY += 13;
+
+      doc.setFontSize(7.5);
+      doc.setFont("helvetica", "normal");
+      const termsLineHeight = 10;
+      const paragraphs = String(terms).split(/\r?\n/);
+
+      for (let pIdx = 0; pIdx < paragraphs.length; pIdx++) {
+        const para = paragraphs[pIdx].trim();
+        if (!para) {
+          currentY += 3;
+          continue;
+        }
+        const lines = doc.splitTextToSize(para, 515);
+        for (let lIdx = 0; lIdx < lines.length; lIdx++) {
+          if (currentY + termsLineHeight > contentMaxY) {
+            doc.addPage();
+            currentY = 40;
+          }
+          doc.text(lines[lIdx], 40, currentY);
+          currentY += termsLineHeight;
+        }
+        currentY += 3;
+      }
     }
 
-    // Add footer text to all pages
+    // Add updated branded footer (attached image + copyright line) to all pages
     function addFooter(doc) {
       const pageCount = doc.internal.getNumberOfPages();
-      const footerText = "Produced by Time Track Invoice. Developed by itsmyapp.co.uk Copyright 2025.";
+      const pWidth = doc.internal.pageSize.getWidth();
+      const pHeight = doc.internal.pageSize.getHeight();
+      const bannerWidth = 420;
+      const bannerHeight = bannerWidth * (121 / 1024); // ~49.6pt
+      const bannerX = (pWidth - bannerWidth) / 2;
+      const bannerY = pHeight - bannerHeight - 24;
+      const textY = pHeight - 12;
+      const footerText = "Powered by Time Track Invoice © 2026 ItsMyApp.co.uk | All rights reserved";
+
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const y = doc.internal.pageSize.getHeight() - 30;
-        const textWidth = doc.getTextWidth(footerText);
-        const x = (pageWidth - textWidth) / 2;
-        doc.text(footerText, x, y);
+        // 1. Draw branded banner image with clickable URL
+        try {
+          if (ITSMYAPP_BANNER_BASE64) {
+            doc.addImage(ITSMYAPP_BANNER_BASE64, "PNG", bannerX, bannerY, bannerWidth, bannerHeight);
+            doc.link(bannerX, bannerY, bannerWidth, bannerHeight, { url: "https://itsmyapp.co.uk" });
+          }
+        } catch (imgErr) {
+          console.warn("Could not embed banner image in invoice PDF footer:", imgErr);
+        }
+
+        // 2. Draw copyright text
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(71, 85, 105); // slate-600
+        doc.text(footerText, pWidth / 2, textY, { align: "center" });
+        doc.setTextColor(0, 0, 0); // reset
       }
     }
 
@@ -500,8 +622,24 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
                   placeholder="Due Date"
                 />
               </div>
+              {/* Mileage Override Section */}
+              <div className="mt-4 p-3 border rounded bg-gray-50">
+                <label className="font-semibold block mb-1">Total Mileage Override</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    className="p-2 border rounded flex-1 text-slate-900 bg-white"
+                    placeholder={`Calculated: ${form.id ? (dayItems.filter(i => i.type === 'mileage').reduce((sum, i) => sum + (parseFloat(i.miles) || 0), 0)) : (getInvoiceDayItems().filter(i => i.type === 'mileage').reduce((sum, i) => sum + (parseFloat(i.miles) || 0), 0))} mi`}
+                    value={form.mileageOverride !== null && form.mileageOverride !== undefined ? form.mileageOverride : ''}
+                    onChange={e => setForm(f => ({ ...f, mileageOverride: e.target.value === '' ? null : parseFloat(e.target.value) }))}
+                  />
+                  <span className="text-sm text-gray-500">Leave blank to use calculated total</span>
+                </div>
+              </div>
               {/* Manual Invoice Items Section */}
-              <div className="mt-6 mb-2">
+              <div className="mt-4 mb-2">
                 <h4 className="font-semibold mb-2">Manual Invoice Items</h4>
                 {manualItems.length === 0 && (
                   <div className="text-gray-500 mb-2">No manual items added.</div>

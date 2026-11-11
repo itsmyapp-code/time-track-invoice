@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUsers, FaPlus, FaEdit, FaTrash, FaBars, FaTimes } from "react-icons/fa";
+import { FaUsers, FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 
 const DEFAULT_FORM = {
   name: "",

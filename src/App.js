@@ -36,6 +36,11 @@ import AuthView from "./components/AuthView";
 import LandingPage from "./components/LandingPage";
 import Paywall from "./components/Paywall";
 import AdminPage from "./components/AdminPage";
+import TermsPage from "./components/legal/TermsPage";
+import PrivacyPage from "./components/legal/PrivacyPage";
+import CookiesPage from "./components/legal/CookiesPage";
+import AccessibilityPage from "./components/legal/AccessibilityPage";
+import CookieConsent from "./components/CookieConsent";
 import { addOfflineAction, getOfflineActions, clearOfflineActions } from './offlineActions';
 import { usePwsReminders } from './hooks/usePwsReminders';
 // serviceWorkerRegistration.register();
@@ -70,7 +75,7 @@ const SettingsView = ({ settings, updateSettings, navigate }) => {
     <div className="p-4">
       <h2 className="text-xl font-bold mb-2">Business Details (for invoices)</h2>
       <form onSubmit={e => { e.preventDefault(); updateSettings(form); }}>
-        {["ownerName", "address", "town", "county", "postcode", "phone", "email", "vatNumber", "bankAccountName", "sortCode", "accountNumber", "termsConditions"].map(field => (
+        {["ownerName", "address", "town", "county", "postcode", "phone", "email", "vatNumber", "bankAccountName", "sortCode", "accountNumber", "mileageRate", "termsConditions"].map(field => (
           <div key={field} className="mb-2">
             <label className="mr-2">{field.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())}:</label>
             {field === "termsConditions" ? (
@@ -93,6 +98,23 @@ const SettingsView = ({ settings, updateSettings, navigate }) => {
         <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 disabled:opacity-50" disabled={loadingPortal} type="button" onClick={handleManageSubscription}>
           {loadingPortal ? "Loading Portal..." : "Manage Subscription"}
         </button>
+      </div>
+
+      {/* Statutory Subscription & Compliance Notice */}
+      <div className="mt-8 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 space-y-2">
+        <p className="font-semibold text-slate-800">Subscription &amp; Consumer Protection Notice (DMCCA 2024 / UK GDPR):</p>
+        <p>
+          <strong>The "Same-Channel" Exit:</strong> You may modify or terminate your subscription at any time with a single click using the "Manage Subscription" button above. Cancellations are processed immediately through our secure customer billing portal.
+        </p>
+        <p>
+          <strong>14-Day Cooling-Off Period:</strong> You retain statutory cooling-off cancellation rights for 14 days following any initial subscription or annual renewal. For cancellations executed within this window, a proportionate refund is issued.
+        </p>
+        <p>
+          For compliance or SAR requests, contact our Data Privacy Lead at{" "}
+          <a href="mailto:hello@itsmyapp.co.uk" className="text-indigo-600 underline">
+            hello@itsmyapp.co.uk
+          </a>.
+        </p>
       </div>
     </div>
   );
@@ -229,6 +251,15 @@ const App = () => {
             }
             if (action.type === 'deleteDayItem') {
               await deleteDoc(doc(db, "users", user.uid, "dayItems", action.itemId));
+            }
+            if (action.type === 'addDayItem') {
+              await addDoc(collection(db, "users", user.uid, "dayItems"), {
+                jobId: action.jobId,
+                date: action.date,
+                type: action.itemType,
+                miles: action.miles || 0,
+                createdAt: serverTimestamp()
+              });
             }
           } catch (err) {
             console.error("Error syncing offline action:", action, err);
@@ -447,15 +478,15 @@ const App = () => {
     }
   }, [user, isOnline]);
 
-  const handleAddDayItem = useCallback(async (jobId, { date, type }) => {
+  const handleAddDayItem = useCallback(async (jobId, { date, type, miles }) => {
     if (user) {
       if (!isOnline) {
         // Simple offline fallback
-        await addOfflineAction({ type: 'addDayItem', jobId, date, itemType: type });
+        await addOfflineAction({ type: 'addDayItem', jobId, date, itemType: type, miles });
         return;
       }
       try {
-        await addDoc(collection(db, "users", user.uid, "dayItems"), { jobId, date, type, createdAt: serverTimestamp() });
+        await addDoc(collection(db, "users", user.uid, "dayItems"), { jobId, date, type, miles: miles || 0, createdAt: serverTimestamp() });
       } catch (error) {
         console.error("Add day item error:", error);
       }
@@ -678,6 +709,10 @@ const App = () => {
       {/* If absolutely not logged in, we only allow access to landing page, or they hit auth view. If they hit / we show landing page, if they hit /app we show auth view */}
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/cookies" element={<CookiesPage />} />
+        <Route path="/accessibility" element={<AccessibilityPage />} />
 
         {/* Everything else requires login */}
         <Route path="*" element={
@@ -785,6 +820,10 @@ const App = () => {
                   <SettingsView settings={settings} updateSettings={updateSettings} navigate={navigate} />
                 } />
                 <Route path="/help" element={<HelpPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/cookies" element={<CookiesPage />} />
+                <Route path="/accessibility" element={<AccessibilityPage />} />
 
                 {/* Admin Route */}
                 {user.email && user.email.toLowerCase() === 'martin@cozens.me.uk' && (
@@ -796,6 +835,9 @@ const App = () => {
           )
         } />
       </Routes>
+
+      {/* Statutory Cookie & Consent Banner (Part I Compliance) */}
+      <CookieConsent />
     </div>
   );
 };

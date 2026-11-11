@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { FaLock, FaEnvelope } from "react-icons/fa";
+import GlobalFooter from "./GlobalFooter";
 
 export default function AuthView({
     handleLogin,
@@ -23,8 +25,9 @@ export default function AuthView({
     const btnPrimary = "w-full py-3 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5";
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative z-10">
+        <div className="min-h-screen flex flex-col justify-between bg-slate-50">
+            <div className="flex-1 flex items-center justify-center p-4 py-8">
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative z-10">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-8 text-center">
                     <div className="flex justify-center mb-4">
@@ -116,23 +119,21 @@ export default function AuthView({
                         </button>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap justify-center gap-4 text-xs text-slate-500">
-                        <button type="button" onClick={() => setShowTerms(true)} className="hover:text-indigo-600 transition-colors">Terms & Conditions</button>
+                    <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap justify-center gap-3 text-xs text-slate-500 font-medium">
+                        <Link to="/terms" className="hover:text-indigo-600 transition-colors">Terms</Link>
                         <span>•</span>
-                        <button type="button" onClick={() => setShowPrivacy(true)} className="hover:text-indigo-600 transition-colors">Privacy Policy</button>
+                        <Link to="/privacy" className="hover:text-indigo-600 transition-colors">Privacy</Link>
                         <span>•</span>
-                        <button type="button" onClick={() => setShowCookie(true)} className="hover:text-indigo-600 transition-colors">Cookie Policy</button>
-                    </div>
-
-                    <div className="mt-8 text-center text-xs text-slate-400">
-                        <div className="flex flex-col items-center gap-2">
-                            <img src="/itsmyapp_logo.png" alt="ItsMyApp" className="h-6 w-auto transition-all" />
-                            <p>Powered by Time Track Invoice © 2026 ItsMyApp.co.uk</p>
-                            <p>All rights reserved | <a href="mailto:hello@itsmyapp.co.uk" className="hover:text-indigo-600">hello@itsmyapp.co.uk</a></p>
-                        </div>
+                        <Link to="/cookies" className="hover:text-indigo-600 transition-colors">Cookies</Link>
+                        <span>•</span>
+                        <Link to="/accessibility" className="hover:text-indigo-600 transition-colors">Accessibility</Link>
                     </div>
                 </div>
             </div>
+            </div>
+
+            {/* Global Legal Compliance Footer */}
+            <GlobalFooter theme="light" />
 
             {/* Modals */}
             {shouldShowModal(showTerms, setShowTerms, "Terms of Service", (

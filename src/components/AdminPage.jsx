@@ -14,9 +14,23 @@ export default function AdminPage({ d, navigate }) {
                 const q = query(collection(d, "users"));
                 const querySnapshot = await getDocs(q);
                 const results = [];
-                querySnapshot.forEach((doc) => {
-                    results.push({ id: doc.id, ...doc.data() });
-                });
+                for (const userDoc of querySnapshot.docs) {
+                    const userData = { id: userDoc.id, ...userDoc.data() };
+                    // Fetch actual Stripe subscription status
+                    try {
+                        const subsSnapshot = await getDocs(collection(userDoc.ref, "subscriptions"));
+                        let stripeStatus = null;
+                        subsSnapshot.forEach(subDoc => {
+                            const s = subDoc.data().status;
+                            if (s === 'active' || s === 'trialing') stripeStatus = s;
+                            else if (!stripeStatus) stripeStatus = s;
+                        });
+                        userData.stripeStatus = stripeStatus;
+                    } catch {
+                        userData.stripeStatus = null;
+                    }
+                    results.push(userData);
+                }
                 setAllUsers(results);
             } catch (err) {
                 console.error("Error fetching all users:", err);
@@ -96,7 +110,8 @@ export default function AdminPage({ d, navigate }) {
                                 <tr>
                                     <th className="p-4 font-semibold text-sm text-slate-600 dark:text-slate-300">User Email</th>
                                     <th className="p-4 font-semibold text-sm text-slate-600 dark:text-slate-300">Name / Extra Info</th>
-                                    <th className="p-4 font-semibold text-sm text-slate-600 dark:text-slate-300">Pro Override</th>
+                                    <th className="p-4 font-semibold text-sm text-slate-600 dark:text-slate-300">Stripe Subscription</th>
+                                    <th className="p-4 font-semibold text-sm text-slate-600 dark:text-slate-300">Admin Override</th>
                                     <th className="p-4 font-semibold text-sm text-right text-slate-600 dark:text-slate-300">Action</th>
                                 </tr>
                             </thead>
@@ -113,13 +128,32 @@ export default function AdminPage({ d, navigate }) {
                                             {user.name || user.displayName || <span className="text-slate-400 italic">Not provided</span>}
                                         </td>
                                         <td className="p-4">
-                                            {user.proOverride ? (
+                                            {user.stripeStatus === 'active' ? (
                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200 shadow-sm">
-                                                    Active Pro
+                                                    Active
+                                                </span>
+                                            ) : user.stripeStatus === 'trialing' ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200 shadow-sm">
+                                                    Trialing
+                                                </span>
+                                            ) : user.stripeStatus ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200 shadow-sm capitalize">
+                                                    {user.stripeStatus}
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200 shadow-sm">
-                                                    Standard
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
+                                                    None
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="p-4">
+                                            {user.proOverride ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200 shadow-sm">
+                                                    Override On
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 border border-slate-200 shadow-sm">
+                                                    —
                                                 </span>
                                             )}
                                         </td>

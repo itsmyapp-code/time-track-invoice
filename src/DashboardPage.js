@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  FaChartPie, FaClock, FaListAlt, FaMoneyBillWave, FaPlay, FaStop, FaCalendarDay, FaCalendarCheck
+  FaChartPie, FaClock, FaListAlt, FaPlay, FaStop, FaCalendarDay, FaCalendarCheck, FaRoad
 } from "react-icons/fa";
 import VoiceInput from "./components/VoiceInput";
 
@@ -35,6 +35,7 @@ export default function DashboardPage({
   const [formJobId, setFormJobId] = useState("");
   const [formDate, setFormDate] = useState("");
   const [formDescription, setFormDescription] = useState("");
+  const [formMiles, setFormMiles] = useState("");
 
   const isAnyModalOpen = showStopModal || showDayModal;
 
@@ -123,15 +124,21 @@ export default function DashboardPage({
       alert("Please select a job and date.");
       return;
     }
+    if (dayType === 'mileage' && (!formMiles || parseFloat(formMiles) <= 0)) {
+      alert("Please enter a valid number of miles.");
+      return;
+    }
     if (handleAddDayItem) {
       handleAddDayItem(formJobId, {
         date: new Date(formDate).getTime(),
-        type: dayType
+        type: dayType,
+        miles: dayType === 'mileage' ? parseFloat(formMiles) : undefined
       });
     }
     setShowDayModal(false);
     setFormClientId("");
     setFormJobId("");
+    setFormMiles("");
   };
 
   const activeClients = clients.filter(c => !c.isArchived);
@@ -172,6 +179,9 @@ export default function DashboardPage({
           </button>
           <button onClick={() => openDayModal('day')} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded shadow-md flex items-center gap-2 text-lg transition-transform hover:scale-105">
             <FaCalendarDay /> Log Day
+          </button>
+          <button onClick={() => openDayModal('mileage')} className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded shadow-md flex items-center gap-2 text-lg transition-transform hover:scale-105">
+            <FaRoad /> Log Mileage
           </button>
         </div>
       </div>
@@ -285,7 +295,7 @@ export default function DashboardPage({
         <div className="fixed inset-0 z-[2000] bg-black bg-opacity-40 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <div className="flex min-h-full items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
-              <h3 className="text-xl font-bold mb-4 text-indigo-600">Log {dayType === 'day' ? '1 Day (v2)' : '1/2 Day (v2)'}</h3>
+              <h3 className="text-xl font-bold mb-4 text-indigo-600">Log {dayType === 'day' ? '1 Day (v2)' : dayType === 'halfDay' ? '1/2 Day (v2)' : 'Mileage (v2)'}</h3>
               <div className="grid grid-cols-1 gap-3">
                 <select
                   className="p-3 border rounded w-full text-slate-900 bg-white"
@@ -305,6 +315,17 @@ export default function DashboardPage({
                   {filteredJobs.map(j => <option key={j.id} value={j.id}>{j.name}</option>)}
                 </select>
                 <input type="date" className="p-3 border rounded w-full text-slate-900 bg-white" value={formDate} onChange={e => setFormDate(e.target.value)} />
+                {dayType === 'mileage' && (
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    placeholder="Total Miles"
+                    className="p-3 border rounded w-full text-slate-900 bg-white"
+                    value={formMiles}
+                    onChange={e => setFormMiles(e.target.value)}
+                  />
+                )}
               </div>
               <div className="flex gap-2 mt-6">
                 <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex-1" onClick={submitDayForm}>Save Entry</button>

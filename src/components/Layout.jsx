@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import GlobalFooter from './GlobalFooter';
 import {
     FaChartPie,
     FaBriefcase,
@@ -173,12 +174,7 @@ export default function Layout({ children, user, isPro, handleLogout }) {
                 </main>
 
                 {/* Footer */}
-                <footer className="bg-white border-t border-slate-100 p-4">
-                    <div className="flex flex-col items-center justify-center gap-2 text-xs text-slate-400">
-                        <img src="/itsmyapp_logo.png" alt="ItsMyApp Logo" className="h-6 w-auto transition-all" />
-                        <p>Powered by Time Track Invoice © 2026 ItsMyApp.co.uk | All rights reserved <a href="mailto:hello@itsmyapp.co.uk" className="hover:text-indigo-600 transition-colors">hello@itsmyapp.co.uk</a></p>
-                    </div>
-                </footer>
+                <GlobalFooter theme="light" />
             </div>
         </div>
     );

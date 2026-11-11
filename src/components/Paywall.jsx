@@ -109,13 +109,16 @@ export default function Paywall({ user }) {
                                         </div>
                                         {!checkoutLoading && (
                                             <span className="text-xs font-normal text-indigo-200">
-                                                Includes a 14-day free trial!
+                                                Includes 14-day free trial &amp; cooling-off period
                                             </span>
                                         )}
                                     </button>
                                 ))}
                             </div>
                         ))}
+                        <p className="text-[11px] text-slate-400 mt-3 leading-normal">
+                            Total price shown is inclusive of all taxes (Anti-Drip Pricing). Features the statutory 14-day cooling-off guarantee and 1-click self-service cancellation via the customer portal.
+                        </p>
                     </div>
                 ) : (
                     <div className="py-4 border border-dashed border-red-300 bg-red-50 text-red-600 rounded-xl">
