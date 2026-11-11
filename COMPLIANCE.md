@@ -1,7 +1,7 @@
 # COMPLIANCE MD: MASTER FRAMEWORK
 **Document Classification:** Internal Governance & Public Manifest Templates  
 **Framework Status:** Certified Compliant (UK GDPR / DUAA 2025 / DMCCA 2024 Frameworks)  
-**Application Name:** Time Track Invoice (`{{APP_NAME}}` / developer.itsmyapp.co.uk)  
+**Application Name:** Time Track Invoice (https://timetrackinvoice.co.uk / developer.itsmyapp.co.uk)  
 **Effective Date:** 3 June 2026  
 **Review Cycle:** Annual (Next Review: June 2027)  
 **Data Controller Endpoint:** [hello@itsmyapp.co.uk](mailto:hello@itsmyapp.co.uk)  
