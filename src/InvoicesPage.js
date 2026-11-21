@@ -68,7 +68,7 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
       document.documentElement.style.overflow = 'unset';
     };
   }, [showModal]);
-  const buttonClass = "app-add-btn flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-sm";
+  const buttonClass = "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-700 hover:bg-blue-800 transition-colors shadow-sm";
 
   const clients = rawClients.map(getClientWithRates);
 
@@ -541,9 +541,9 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
     <div className="p-2 md:p-4">
       {/* Mobile Dropdown Menu Button on the left */}
       {/* Mobile Menu Removed */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-slate-800">
-          <FaFileInvoiceDollar className="text-indigo-600" /> Invoices
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
+        <h2 className="text-2xl font-extrabold flex items-center gap-2.5 text-slate-900 tracking-tight">
+          <FaFileInvoiceDollar className="text-blue-700" /> Invoices
         </h2>
         <button
           className={buttonClass}
@@ -555,29 +555,30 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
       {/* Cards for each invoice, responsive for mobile */}
       <div className="flex flex-col gap-4">
         {savedInvoices.length === 0 && (
-          <div className="text-gray-500">No invoices found.</div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500 shadow-sm">
+            No invoices found.
+          </div>
         )}
         {/* Sort invoices by newest first (createdAt descending) */}
         {[...savedInvoices].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).map(inv => {
           const client = getClient(inv.clientId) || {};
           return (
-            <div key={inv.id} className={`bg-white p-4 rounded shadow border ${isOverdue(inv) ? "border-red-400" : "border-gray-200"} flex flex-col sm:flex-row sm:items-center sm:justify-between`}>
+            <div key={inv.id} className={`bg-white p-5 rounded-2xl shadow-sm border ${isOverdue(inv) ? "border-red-400" : "border-slate-200"} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}>
               <div className="flex-1">
-                <div className="font-bold text-lg">{client.name || "Unknown Client"}</div>
-                <div className="text-sm text-gray-700">Date Range: {formatUKDate(inv.startDate)} - {formatUKDate(inv.endDate)}</div>
-                <div className="text-sm text-gray-700">Due: {formatUKDate(inv.dueDate)}</div>
-                <div className="text-sm text-gray-700">Sessions: {inv.sessions?.length ?? 0}</div>
-                <div className="mt-2">
+                <div className="font-extrabold text-lg text-slate-900">{client.name || "Unknown Client"}</div>
+                <div className="text-sm text-slate-600 mt-0.5">Date Range: {formatUKDate(inv.startDate)} &ndash; {formatUKDate(inv.endDate)}</div>
+                <div className="text-sm text-slate-600">Due: {formatUKDate(inv.dueDate)} &bull; Sessions: {inv.sessions?.length ?? 0}</div>
+                <div className="mt-2.5">
                   {/* Status badge */}
-                  <span className={`inline-block px-3 py-1 rounded-full font-bold text-xs ${inv.status === "paid" ? "bg-green-100 text-green-700" : inv.status === "sent" ? (isOverdue(inv) ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700") : "bg-gray-100 text-gray-700"}`}>{inv.status?.toUpperCase() || "DRAFT"}</span>
+                  <span className={`inline-block px-3 py-1 rounded-full font-bold text-xs ${inv.status === "paid" ? "bg-emerald-100 text-emerald-800" : inv.status === "sent" ? (isOverdue(inv) ? "bg-red-100 text-red-700" : "bg-orange-100 text-orange-800") : "bg-slate-100 text-slate-700"}`}>{inv.status?.toUpperCase() || "DRAFT"}</span>
                 </div>
               </div>
-              <div className="flex gap-2 mt-2 sm:mt-0 p-1 bg-gray-50 rounded shadow-sm border">
-                <button className="p-3 text-blue-600 hover:bg-blue-200 rounded text-xl transition-colors" title="Edit" onClick={() => handleEditInvoice(inv)}><FaEdit /></button>
-                <button className="p-3 text-gray-600 hover:bg-gray-200 rounded text-xl transition-colors" title="Print PDF" onClick={() => handlePrintPDF(inv)}><FaPrint /></button>
-                <button className="p-3 text-green-600 hover:bg-green-200 rounded text-xl transition-colors" title="Mark Paid" onClick={() => handleMarkPaid(inv.id)}><FaCheck /></button>
-                <button className="p-3 text-yellow-600 hover:bg-yellow-200 rounded text-xl transition-colors" title="Email PDF" onClick={() => handleEmailPDF(inv)}><FaEnvelope /></button>
-                <button className="p-3 text-red-600 hover:bg-red-200 rounded text-xl transition-colors" title="Delete" onClick={() => deleteInvoice(inv.id)}><FaTrash /></button>
+              <div className="flex gap-1.5 p-1.5 bg-slate-50 rounded-xl border border-slate-200">
+                <button className="p-2.5 text-blue-700 hover:bg-blue-100 rounded-lg text-lg transition-colors" title="Edit" onClick={() => handleEditInvoice(inv)}><FaEdit /></button>
+                <button className="p-2.5 text-slate-600 hover:bg-slate-200 rounded-lg text-lg transition-colors" title="Print PDF" onClick={() => handlePrintPDF(inv)}><FaPrint /></button>
+                <button className="p-2.5 text-emerald-600 hover:bg-emerald-100 rounded-lg text-lg transition-colors" title="Mark Paid" onClick={() => handleMarkPaid(inv.id)}><FaCheck /></button>
+                <button className="p-2.5 text-orange-600 hover:bg-orange-100 rounded-lg text-lg transition-colors" title="Email PDF" onClick={() => handleEmailPDF(inv)}><FaEnvelope /></button>
+                <button className="p-2.5 text-red-600 hover:bg-red-100 rounded-lg text-lg transition-colors" title="Delete" onClick={() => deleteInvoice(inv.id)}><FaTrash /></button>
               </div>
             </div>
           );
@@ -585,10 +586,12 @@ export default function InvoicesPage({ jobs, clients: rawClients, savedInvoices,
       </div>
       {/* Modal for creating invoice */}
       {showModal && (
-        <div className="fixed inset-0 z-[2000] bg-black bg-opacity-40 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+        <div className="fixed inset-0 z-[2000] bg-slate-900/50 backdrop-blur-xs overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
-              <h3 className="text-xl font-bold mb-4 text-indigo-600">Create Invoice (v2)</h3>
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
+              <h3 className="text-xl font-extrabold mb-4 text-slate-900">
+                {form.id ? "Edit Invoice" : "Create Invoice"}
+              </h3>
               <div className="grid grid-cols-1 gap-3">
                 <select
                   className="p-3 border rounded w-full text-slate-900 bg-white"

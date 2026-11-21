@@ -1,0 +1,218 @@
+/* ItsMyApp Diagonal Sweeping-Blade Auth Card
+ * Uses razor-sharp clip-path polygon transitions (zero skewX raster blur!)
+ * Desktop (>= 768px): horizontal diagonal blade sweep with glowing orange seam.
+ * Mobile (< 768px): vertical diagonal blade sweep with full-width thumb-friendly inputs.
+ */
+
+.ima-auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  min-height: 550px;
+  border-radius: 26px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow:
+    0 24px 60px -15px rgba(15, 23, 42, 0.14),
+    0 8px 20px -8px rgba(29, 78, 216, 0.08);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Form panes — padded away from the diagonal cut so inputs & links are never clipped */
+.ima-auth-pane {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: opacity 420ms ease, transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ima-auth-pane--signin {
+  padding: 42px 64px 42px 44px;
+}
+
+.ima-auth-pane--signup {
+  padding: 42px 44px 42px 68px;
+}
+
+.ima-auth-card[data-mode="signin"] .ima-auth-pane--signup {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(16px);
+}
+
+.ima-auth-card[data-mode="signup"] .ima-auth-pane--signin {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-16px);
+}
+
+/* Glowing Warm-Orange seam backing layer (travels 0.55% ahead of the blue blade edge) */
+.ima-auth-band-seam {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  background: linear-gradient(180deg, #fb923c 0%, #f97316 50%, #ea580c 100%);
+  clip-path: polygon(47.4% 0%, 100% 0%, 100% 100%, 54.4% 100%);
+  transition: clip-path 740ms cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.ima-auth-card[data-mode="signup"] .ima-auth-band-seam {
+  clip-path: polygon(0% 0%, 45.6% 0%, 52.6% 100%, 0% 100%);
+}
+
+/* Desktop diagonal sweeping blade — 100% un-skewed so text & logos stay razor sharp */
+.ima-auth-band {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: linear-gradient(145deg, #0b2e73 0%, #1d4ed8 52%, #173a99 100%);
+  clip-path: polygon(48% 0%, 100% 0%, 100% 100%, 55% 100%);
+  transition: clip-path 740ms cubic-bezier(0.76, 0, 0.24, 1);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.ima-auth-card[data-mode="signup"] .ima-auth-band {
+  clip-path: polygon(0% 0%, 45% 0%, 52% 100%, 0% 100%);
+}
+
+/* Subtle diagonal lighting sheen inside the blade */
+.ima-auth-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 22%, rgba(249, 115, 22, 0.2), transparent 44%),
+    radial-gradient(circle at 82% 80%, rgba(56, 189, 248, 0.18), transparent 46%);
+  pointer-events: none;
+}
+
+.ima-band-page {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.ima-band-page--left {
+  padding: 44px 68px 44px 44px;
+}
+
+.ima-band-page--right {
+  padding: 44px 44px 44px 72px;
+}
+
+/* Mobile-only elements hidden on desktop */
+.ima-mobile-header,
+.ima-mobile-curtain {
+  display: none;
+}
+
+/* Mobile layout (< 768px): vertical diagonal blade sweep */
+@media (max-width: 767px) {
+  .ima-auth-card {
+    max-width: 440px;
+    min-height: 0;
+    border-radius: 22px;
+    display: block;
+  }
+
+  .ima-auth-band,
+  .ima-auth-band-seam {
+    display: none;
+  }
+
+  .ima-mobile-header {
+    display: block;
+    position: relative;
+    background: linear-gradient(135deg, #0b2e73 0%, #1d4ed8 60%, #173a99 100%);
+    color: #ffffff;
+    padding: 28px 24px 42px;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%);
+    overflow: hidden;
+  }
+
+  .ima-mobile-header::after {
+    content: "";
+    position: absolute;
+    left: -5%;
+    right: -5%;
+    bottom: 9px;
+    height: 4px;
+    background: linear-gradient(90deg, #f97316, #fb923c, #f97316);
+    transform: rotate(-2.9deg);
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.75);
+  }
+
+  /* Vertical diagonal sweep curtain during mobile mode transition */
+  .ima-mobile-curtain {
+    display: block;
+    position: absolute;
+    inset: -12% -6%;
+    z-index: 25;
+    pointer-events: none;
+    background: linear-gradient(145deg, #0b2e73 0%, #1d4ed8 55%, #173a99 100%);
+    border-top: 4px solid #f97316;
+    border-bottom: 4px solid #f97316;
+    box-shadow: 0 0 28px rgba(249, 115, 22, 0.55);
+    transform: skewY(-5deg) translateY(-135%);
+  }
+
+  .ima-mobile-curtain[data-sweeping="true"] {
+    animation: imaMobileBladeSweep 620ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  }
+
+  .ima-auth-pane--signin,
+  .ima-auth-pane--signup {
+    padding: 24px 24px 30px;
+  }
+
+  .ima-auth-card[data-mode="signin"] .ima-auth-pane--signup {
+    display: none;
+  }
+
+  .ima-auth-card[data-mode="signup"] .ima-auth-pane--signin {
+    display: none;
+  }
+
+  .ima-auth-card[data-mode="signin"] .ima-auth-pane--signin,
+  .ima-auth-card[data-mode="signup"] .ima-auth-pane--signup {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+}
+
+@keyframes imaMobileBladeSweep {
+  0% {
+    transform: skewY(-5deg) translateY(-135%);
+  }
+  48% {
+    transform: skewY(-5deg) translateY(0%);
+  }
+  52% {
+    transform: skewY(-5deg) translateY(0%);
+  }
+  100% {
+    transform: skewY(-5deg) translateY(135%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ima-auth-band,
+  .ima-auth-band-seam,
+  .ima-auth-pane {
+    transition: none !important;
+  }
+  .ima-mobile-curtain[data-sweeping="true"] {
+    animation: none !important;
+  }
+}

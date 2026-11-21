@@ -341,26 +341,26 @@ export default function ReportsPage({
     checkImages();
   }
 
-  const cardClass = "app-card mb-4 rounded-lg shadow-sm bg-white p-2";
-  const buttonClass = "app-add-btn flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-white bg-blue-600 hover:bg-blue-700 transition";
+  const cardClass = "mb-3 rounded-2xl border border-slate-200 shadow-sm bg-white p-4";
+  const buttonClass = "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-700 hover:bg-blue-800 disabled:opacity-50 shadow-sm transition-colors";
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-          <FaChartBar className="text-indigo-600" />
-          {reportType === "sessions" ? " Session Reports" : " Invoice Reports"}
+    <div className="p-2 md:p-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
+        <h2 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2.5 tracking-tight">
+          <FaChartBar className="text-blue-700" />
+          {reportType === "sessions" ? "Session Reports" : "Invoice Reports"}
         </h2>
-        <div className="flex gap-2">
+        <div className="inline-flex rounded-xl overflow-hidden border border-slate-200 bg-white shadow-xs">
           <button
             onClick={() => setReportType("sessions")}
-            className={`px-4 py-2 rounded-l-lg font-medium border ${reportType === "sessions" ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-300"}`}
+            className={`px-4 py-2 text-sm font-bold transition-colors ${reportType === "sessions" ? "bg-blue-700 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}
           >
             Sessions
           </button>
           <button
             onClick={() => setReportType("invoices")}
-            className={`px-4 py-2 rounded-r-lg font-medium border ${reportType === "invoices" ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600 border-gray-300"}`}
+            className={`px-4 py-2 text-sm font-bold transition-colors ${reportType === "invoices" ? "bg-blue-700 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}
           >
             Invoices
           </button>
@@ -374,31 +374,31 @@ export default function ReportsPage({
         </button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6 items-center">
-        <div className="flex items-center gap-2">
-          <label className="font-medium">Start Date:</label>
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 mb-6 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+        <div className="flex items-center gap-2 flex-1">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-600 whitespace-nowrap">Start:</label>
           <input
             type="date"
             value={startDate}
             onChange={e => setStartDate && setStartDate(e.target.value)}
-            className="border rounded px-3 py-2 text-slate-900 bg-white"
+            className="border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 bg-white w-full focus:border-blue-600 outline-none"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <label className="font-medium">End Date:</label>
+        <div className="flex items-center gap-2 flex-1">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-600 whitespace-nowrap">End:</label>
           <input
             type="date"
             value={endDate}
             onChange={e => setEndDate && setEndDate(e.target.value)}
-            className="border rounded px-3 py-2 text-slate-900 bg-white"
+            className="border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 bg-white w-full focus:border-blue-600 outline-none"
           />
         </div>
-        <div className="flex items-center gap-2">
-          <label className="font-medium">Client:</label>
+        <div className="flex items-center gap-2 flex-1">
+          <label className="text-xs font-bold uppercase tracking-wider text-slate-600 whitespace-nowrap">Client:</label>
           <select
             value={selectedClientId}
             onChange={e => setSelectedClientId && setSelectedClientId(e.target.value)}
-            className="border rounded px-2 py-2 text-slate-900 bg-white"
+            className="border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 bg-white w-full focus:border-blue-600 outline-none"
           >
             <option value="">Select Client</option>
             {activeClients.map(client => (

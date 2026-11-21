@@ -110,22 +110,19 @@ const ClientsPage = ({
     setFormData(DEFAULT_FORM);
   };
 
-  // Consistent button and card styles
-  const cardClass = "app-card mb-4 rounded-lg shadow-sm bg-white p-2";
-  const buttonClass = "app-add-btn flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-white bg-blue-600 hover:bg-blue-700 transition";
+  // Consistent button and card styles (ItsMyApp Light-Mode Standard)
+  const cardClass = "mb-4 rounded-2xl border border-slate-200 shadow-sm bg-white p-5";
+  const buttonClass = "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-700 hover:bg-blue-800 shadow-sm transition-colors";
 
   return (
-    <div className="p-4 pt-8 md:pt-4 max-w-2xl mx-auto">
-      {/* Mobile Dropdown Menu Button on the left */}
-      {/* Mobile Menu Removed */}
-      {/* Add Client Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-slate-800">
-          <FaUsers className="text-indigo-600" /> Clients
+    <div className="p-2 md:p-4 max-w-3xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
+        <h2 className="text-2xl font-extrabold flex items-center gap-2.5 text-slate-900 tracking-tight">
+          <FaUsers className="text-blue-700" /> Clients
         </h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2.5">
           <button
-            className="text-gray-600 hover:text-gray-800 font-medium px-3 py-1 border rounded"
+            className="text-slate-700 bg-white hover:bg-slate-50 font-semibold text-sm px-4 py-2.5 border border-slate-200 rounded-xl shadow-xs transition-colors"
             onClick={() => setShowArchived(!showArchived)}
           >
             {showArchived ? "Hide Archived" : "Show Archived"}
@@ -142,49 +139,51 @@ const ClientsPage = ({
 
       <div className="grid grid-cols-1 gap-4">
         {filteredClients.length === 0 ? (
-          <div className="text-gray-500 mb-4">No {showArchived ? "archived" : "active"} clients found.</div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500 shadow-sm">
+            No {showArchived ? "archived" : "active"} clients found.
+          </div>
         ) : (
           <div className="mb-8">
             {filteredClients.map(client => (
               <div key={client.id} className={cardClass}>
-                <div className="font-semibold text-lg mb-1">{client.name}</div>
-                <div className="text-gray-700 mb-1"><span className="font-medium">Email:</span> {client.email}</div>
-                <div className="text-gray-700 mb-1"><span className="font-medium">Phone:</span> {client.phone}</div>
-                <div className="text-gray-700 mb-1">
-                  <span className="font-medium">Address:</span> {client.address}
+                <div className="font-extrabold text-lg text-slate-900 mb-1.5">{client.name}</div>
+                <div className="text-sm text-slate-700 mb-1"><span className="font-semibold text-slate-900">Email:</span> {client.email || "-"}</div>
+                <div className="text-sm text-slate-700 mb-1"><span className="font-semibold text-slate-900">Phone:</span> {client.phone || "-"}</div>
+                <div className="text-sm text-slate-700 mb-1">
+                  <span className="font-semibold text-slate-900">Address:</span> {client.address}
                   {client.town && `, ${client.town}`}
                   {client.county && `, ${client.county}`}
                   {client.postcode && `, ${client.postcode}`}
                 </div>
                 {client.terms && (
-                  <div className="text-gray-600 mt-1">
-                    <span className="font-medium">Terms:</span> {client.terms}
+                  <div className="text-sm text-slate-600 mt-1">
+                    <span className="font-semibold text-slate-900">Terms:</span> {client.terms}
                   </div>
                 )}
-                <div className="text-gray-600 mt-1">
-                  <span className="font-medium">Day Rate:</span> £{client.dayRate?.toFixed?.(2) ?? Number(client.dayRate || 0).toFixed(2)}
-                  {" • "}
-                  <span className="font-medium">Half Day Rate:</span> £{client.halfDayRate?.toFixed?.(2) ?? Number(client.halfDayRate || 0).toFixed(2)}
-                  {" • "}
-                  <span className="font-medium">Hour Rate:</span> £{client.hourRate?.toFixed?.(2) ?? Number(client.hourRate || 0).toFixed(2)}
+                <div className="text-xs text-slate-600 mt-2.5 pt-2.5 border-t border-slate-100 flex flex-wrap gap-x-3 gap-y-1">
+                  <span><strong className="text-slate-900">Day Rate:</strong> £{client.dayRate?.toFixed?.(2) ?? Number(client.dayRate || 0).toFixed(2)}</span>
+                  <span aria-hidden="true">&bull;</span>
+                  <span><strong className="text-slate-900">Half Day Rate:</strong> £{client.halfDayRate?.toFixed?.(2) ?? Number(client.halfDayRate || 0).toFixed(2)}</span>
+                  <span aria-hidden="true">&bull;</span>
+                  <span><strong className="text-slate-900">Hour Rate:</strong> £{client.hourRate?.toFixed?.(2) ?? Number(client.hourRate || 0).toFixed(2)}</span>
                 </div>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-4">
                   <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded flex items-center gap-1"
+                    className="bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-colors"
                     onClick={() => handleEdit(client)}
                     title="Edit Client"
                   >
                     <FaEdit /> Edit
                   </button>
                   <button
-                    className={`${client.isArchived ? "bg-green-500 hover:bg-green-600" : "bg-orange-500 hover:bg-orange-600"} text-white px-3 py-1 rounded flex items-center gap-1`}
+                    className={`${client.isArchived ? "bg-emerald-600 hover:bg-emerald-700" : "bg-orange-500 hover:bg-orange-600"} text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-colors`}
                     onClick={() => archiveClient(client.id, !client.isArchived)}
                     title={client.isArchived ? "Unarchive" : "Archive"}
                   >
                     {client.isArchived ? "Unarchive" : "Archive"}
                   </button>
                   <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded flex items-center gap-1"
+                    className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-colors"
                     onClick={() => handleDelete(client.id)}
                     title="Delete Client"
                   >
@@ -198,11 +197,11 @@ const ClientsPage = ({
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-[2000] bg-black bg-opacity-40 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+        <div className="fixed inset-0 z-[2000] bg-slate-900/50 backdrop-blur-xs overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
-              <h3 className="text-xl font-bold mb-4 text-indigo-600">
-                {editingClient ? "Edit Client (v2)" : "Add Client (v2)"}
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
+              <h3 className="text-xl font-extrabold mb-4 text-slate-900">
+                {editingClient ? "Edit Client" : "Add Client"}
               </h3>
               <div className="grid grid-cols-1 gap-3">
                 <input

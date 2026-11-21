@@ -14,8 +14,27 @@ function formatUKDate(date) {
   if (!date) return "";
   return new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
+function formatUKTime(date) {
+  if (!date) return "";
+  return new Date(date).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+}
+function toLocalDateInput(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+function toLocalTimeInput(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const h = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${h}:${min}`;
+}
 function formatTime(ms) {
-  if (!ms) return "0h 0m";
+  if (!ms || ms < 0) return "0h 0m";
   const totalSeconds = Math.floor(ms / 1000);
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -28,6 +47,7 @@ export default function JobsPage({
   startTimer,
   stopTimer,
   handleManualEntry,
+  updateSession,
   sessions,
   handleAddJob,
   editJob,
@@ -36,7 +56,6 @@ export default function JobsPage({
   archiveJob,
   dayItems = [],
   deleteDayItem,
-  // Remove setActiveView, use navigate instead
 }) {
   // Photo state per job (from Firebase)
   const [jobPhotos, setJobPhotos] = useState({});
@@ -167,6 +186,66 @@ export default function JobsPage({
   // Add Job Modal
   const [showAddJob, setShowAddJob] = useState(false);
   const [newJob, setNewJob] = useState({ name: "", rate: "", clientId: "" });
+
+  // Edit Session Modal
+  const [showEditSession, setShowEditSession] = useState(false);
+  const [editingSession, setEditingSession] = useState(null);
+  const [editSessionForm, setEditSessionForm] = useState({
+    date: "",
+    startTime: "",
+    endTime: "",
+    description: ""
+  });
+  const [editSessionError, setEditSessionError] = useState("");
+
+  const openEditSessionModal = (session) => {
+    const startTs = session.startTime || Date.now();
+    const endTs = session.endTime || (session.startTime ? session.startTime + (session.duration || 0) : Date.now());
+    setEditingSession(session);
+    setEditSessionForm({
+      date: toLocalDateInput(startTs),
+      startTime: toLocalTimeInput(startTs),
+      endTime: toLocalTimeInput(endTs),
+      description: session.description || session.notes || ""
+    });
+    setEditSessionError("");
+    setShowEditSession(true);
+  };
+
+  const getEditSessionPreview = () => {
+    if (!editSessionForm.date || !editSessionForm.startTime || !editSessionForm.endTime) {
+      return { valid: false, duration: 0, startMs: null, endMs: null };
+    }
+    const startMs = new Date(`${editSessionForm.date}T${editSessionForm.startTime}`).getTime();
+    const endMs = new Date(`${editSessionForm.date}T${editSessionForm.endTime}`).getTime();
+    if (isNaN(startMs) || isNaN(endMs) || endMs <= startMs) {
+      return { valid: false, duration: 0, startMs, endMs };
+    }
+    const rawDuration = endMs - startMs;
+    const billedDuration = Math.ceil(rawDuration / 60000 / 15) * 15 * 60000;
+    return { valid: true, duration: billedDuration, rawDuration, startMs, endMs };
+  };
+
+  const handleEditSessionSave = async (e) => {
+    e.preventDefault();
+    if (!editingSession) return;
+    const preview = getEditSessionPreview();
+    if (!preview.valid) {
+      setEditSessionError("End time must be after start time.");
+      return;
+    }
+    if (updateSession) {
+      await updateSession(editingSession.id, {
+        startTime: preview.startMs,
+        endTime: preview.endMs,
+        duration: preview.duration,
+        description: editSessionForm.description
+      });
+    }
+    setShowEditSession(false);
+    setEditingSession(null);
+    setEditSessionError("");
+  };
 
   // Edit Job Modal
   const [showEditJob, setShowEditJob] = useState(false);
@@ -334,11 +413,11 @@ export default function JobsPage({
     }
   }
 
-  // Consistent button and card styles
-  const cardClass = "app-card mb-4 rounded-lg shadow-sm bg-white p-2";
-  const buttonClass = "app-add-btn flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-white bg-blue-600 hover:bg-blue-700 transition";
+  // Consistent button and card styles (ItsMyApp Light-Mode Standard)
+  const cardClass = "mb-4 rounded-2xl border border-slate-200 shadow-sm bg-white overflow-hidden";
+  const buttonClass = "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm text-white bg-blue-700 hover:bg-blue-800 shadow-sm transition-colors";
 
-  const isModalOpen = showPhotoModal || showAddJob || showManual || showReportModal || showEditJob;
+  const isModalOpen = showPhotoModal || showAddJob || showManual || showReportModal || showEditJob || showEditSession;
 
   useEffect(() => {
     if (isModalOpen) {
@@ -370,15 +449,13 @@ export default function JobsPage({
 
   return (
     <div className="p-2 md:p-4" style={{ minHeight: "100vh" }}>
-      {/* Mobile Dropdown Menu Button on the left */}
-      {/* Mobile Menu Removed */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold mb-2 flex items-center gap-2 text-slate-800">
-          <FaBriefcase className="text-indigo-600" /> Jobs
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
+        <h2 className="text-2xl font-extrabold flex items-center gap-2.5 text-slate-900 tracking-tight">
+          <FaBriefcase className="text-blue-700" /> Jobs
         </h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2.5">
           <button
-            className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition shadow-sm border ${showArchived ? 'bg-gray-600 text-white border-gray-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm border ${showArchived ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
             onClick={() => setShowArchived(!showArchived)}
           >
             {showArchived ? <><FaBoxOpen /> Show Active Jobs</> : <><FaArchive /> Show Archived Jobs</>}
@@ -393,170 +470,205 @@ export default function JobsPage({
       </div>
       {/* Grouped by Customer (Client) */}
       {jobsByClient.length === 0 ? (
-        <div className="text-gray-500 mb-4">No jobs found.</div>
+        <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500 shadow-sm">
+          No jobs found.
+        </div>
       ) : (
-        <div className="mb-8">
+        <div className="mb-8 space-y-4">
           {jobsByClient.map(client => (
             <div key={client.id} className={cardClass}>
               <button
-                className="w-full text-left px-4 py-3 bg-blue-100 hover:bg-blue-200 font-semibold text-blue-900 rounded-t"
+                className="w-full text-left px-5 py-3.5 bg-blue-50/80 hover:bg-blue-100/80 font-bold text-blue-900 flex items-center justify-between transition-colors border-b border-slate-100"
                 onClick={() => setExpandedClientId(expandedClientId === client.id ? null : client.id)}
               >
-                {client.name}
+                <span>{client.name}</span>
+                <span className="text-xs font-semibold text-blue-700 bg-white px-2.5 py-0.5 rounded-full border border-blue-200">
+                  {client.jobs.length} {client.jobs.length === 1 ? "job" : "jobs"}
+                </span>
               </button>
               {expandedClientId === client.id && (
-                <div className="pl-2 pr-2 pb-3">
-                  <div className="overflow-x-auto rounded-lg">
-                    <div className="flex flex-col gap-4">
-                      {client.jobs.map(job => (
-                        <div key={job.id} className={cardClass}>
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                            <div className="font-semibold text-base mb-2 sm:mb-0">
-                              {job.name} <span className="text-gray-500 font-normal text-sm ml-2">(£{Number(job.hourlyRate || 0).toFixed(2)}/hr)</span>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {/* Timer controls */}
-                              {!getRunningSession(job.id) ? (
-                                <button
-                                  className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full"
-                                  onClick={() => startTimer(job.id)}
-                                  title="Start Timer"
-                                >
-                                  <FaPlay />
-                                </button>
-                              ) : (
-                                <button
-                                  className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full"
-                                  onClick={() => stopTimer(job.id)}
-                                  title="Stop Timer"
-                                >
-                                  <FaStop />
-                                </button>
-                              )}
-                              <button
-                                className="bg-gray-500 hover:bg-gray-700 text-white p-2 rounded-full"
-                                onClick={() => {
-                                  setManualJobId(job.id);
-                                  setShowManual(true);
-                                }}
-                                title="Manual Entry"
-                              >
-                                <FaEdit />
-                              </button>
-                              <button
-                                className="bg-purple-300 hover:bg-purple-500 text-white p-2 rounded-full"
-                                onClick={() => {
-                                  setPhotoJobId(job.id);
-                                  setShowPhotoModal(true);
-                                }}
-                                title="Add Job Photo"
-                              >
-                                <FaCamera />
-                              </button>
-                              <button
-                                className="bg-orange-300 hover:bg-orange-500 text-white p-2 rounded-full"
-                                onClick={async () => {
-                                  setReportJobId(job.id);
-                                  setShowReportModal(true);
-                                  if (
-                                    typeof job.id === "string" &&
-                                    job.id.trim() !== "" &&
-                                    job.id !== null
-                                  ) {
-                                    try {
-                                      const photos = await fetchJobPhotos(job.id);
-                                      setJobPhotos(prev => ({ ...prev, [job.id]: photos }));
-                                    } catch (err) {
-                                      console.error("Could not fetch job photos for job.id:", job.id, err);
-                                    }
-                                  }
-                                }}
-                                title="Job Photo Report"
-                              >
-                                <FaFileAlt />
-                              </button>
-                              <button
-                                className={`${job.isArchived ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-400 hover:bg-gray-500'} text-white p-2 rounded-full`}
-                                onClick={() => archiveJob && archiveJob(job.id, !job.isArchived)}
-                                title={job.isArchived ? "Unarchive Job" : "Archive Job"}
-                              >
-                                {job.isArchived ? <FaBoxOpen /> : <FaArchive />}
-                              </button>
-
-                              <button
-                                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full"
-                                onClick={() => {
-                                  setEditingJob(job);
-                                  setEditJobForm({ name: job.name, rate: job.hourlyRate ? job.hourlyRate.toString() : "", clientId: job.clientId });
-                                  setShowEditJob(true);
-                                }}
-                                title="Edit Job"
-                              >
-                                <FaEdit />
-                              </button>
-                              <button
-                                className="bg-red-300 hover:bg-red-500 text-white p-2 rounded-full"
-                                onClick={() => deleteJob(job.id)}
-                                title="Delete Job"
-                              >
-                                <FaTrash />
-                              </button>
-                              <button
-                                className="bg-blue-200 hover:bg-blue-400 text-blue-900 p-2 rounded-full text-xs"
-                                onClick={() => setExpandedJobId(expandedJobId === job.id ? null : job.id)}
-                              >
-                                {expandedJobId === job.id ? "Hide Sessions" : "Show Sessions"}
-                              </button>
-                            </div>
+                <div className="p-4 space-y-4 bg-slate-50/50">
+                  {client.jobs.map(job => (
+                    <div key={job.id} className="bg-white rounded-xl border border-slate-200 shadow-xs p-4">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div className="font-bold text-base text-slate-900">
+                          {job.name}{" "}
+                          <span className="text-slate-500 font-medium text-sm ml-1.5">
+                            (£{Number(job.hourlyRate || 0).toFixed(2)}/hr)
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Timer controls */}
+                          {!getRunningSession(job.id) ? (
+                            <button
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white p-2.5 rounded-xl transition-colors"
+                              onClick={() => startTimer(job.id)}
+                              title="Start Timer"
+                            >
+                              <FaPlay size={13} />
+                            </button>
+                          ) : (
+                            <button
+                              className="bg-red-600 hover:bg-red-700 text-white p-2.5 rounded-xl transition-colors"
+                              onClick={() => stopTimer(job.id)}
+                              title="Stop Timer"
+                            >
+                              <FaStop size={13} />
+                            </button>
+                          )}
+                          <button
+                            className="bg-slate-600 hover:bg-slate-700 text-white p-2.5 rounded-xl transition-colors"
+                            onClick={() => {
+                              setManualJobId(job.id);
+                              setShowManual(true);
+                            }}
+                            title="Add Manual Session"
+                          >
+                            <FaPlus size={13} />
+                          </button>
+                          <button
+                            className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition-colors"
+                            onClick={() => {
+                              setPhotoJobId(job.id);
+                              setShowPhotoModal(true);
+                            }}
+                            title="Add Job Photo"
+                          >
+                            <FaCamera size={13} />
+                          </button>
+                          <button
+                            className="bg-orange-500 hover:bg-orange-600 text-white p-2.5 rounded-xl transition-colors"
+                            onClick={async () => {
+                              setReportJobId(job.id);
+                              setShowReportModal(true);
+                              if (
+                                typeof job.id === "string" &&
+                                job.id.trim() !== "" &&
+                                job.id !== null
+                              ) {
+                                try {
+                                  const photos = await fetchJobPhotos(job.id);
+                                  setJobPhotos(prev => ({ ...prev, [job.id]: photos }));
+                                } catch (err) {
+                                  console.error("Could not fetch job photos for job.id:", job.id, err);
+                                }
+                              }
+                            }}
+                            title="Job Photo Report"
+                          >
+                            <FaFileAlt size={13} />
+                          </button>
+                          <button
+                            className={`${job.isArchived ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-400 hover:bg-slate-500'} text-white p-2.5 rounded-xl transition-colors`}
+                            onClick={() => archiveJob && archiveJob(job.id, !job.isArchived)}
+                            title={job.isArchived ? "Unarchive Job" : "Archive Job"}
+                          >
+                            {job.isArchived ? <FaBoxOpen size={13} /> : <FaArchive size={13} />}
+                          </button>
+                          <button
+                            className="bg-blue-700 hover:bg-blue-800 text-white p-2.5 rounded-xl transition-colors"
+                            onClick={() => {
+                              setEditingJob(job);
+                              setEditJobForm({ name: job.name, rate: job.hourlyRate ? job.hourlyRate.toString() : "", clientId: job.clientId });
+                              setShowEditJob(true);
+                            }}
+                            title="Edit Job"
+                          >
+                            <FaEdit size={13} />
+                          </button>
+                          <button
+                            className="bg-red-500 hover:bg-red-600 text-white p-2.5 rounded-xl transition-colors"
+                            onClick={() => deleteJob(job.id)}
+                            title="Delete Job"
+                          >
+                            <FaTrash size={13} />
+                          </button>
+                          <button
+                            className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+                            onClick={() => setExpandedJobId(expandedJobId === job.id ? null : job.id)}
+                          >
+                            {expandedJobId === job.id ? "Hide Sessions" : "Show Sessions"}
+                          </button>
+                        </div>
+                      </div>
+                      {/* Show job sessions if expanded */}
+                      {expandedJobId === job.id && (
+                        <div className="bg-slate-50 border border-slate-200 mt-4 rounded-xl p-3.5 w-full overflow-x-auto">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-bold text-sm text-slate-800">Logged Sessions</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setManualJobId(job.id);
+                                setShowManual(true);
+                              }}
+                              className="text-xs font-bold text-blue-700 hover:text-orange-600 transition-colors"
+                            >
+                              + Add Manual Session
+                            </button>
                           </div>
-                          {/* Show job sessions if expanded */}
-                          {expandedJobId === job.id && (
-                            <div className="bg-blue-50 mt-2 rounded p-2 w-full overflow-x-auto">
-                              <span className="font-medium">Sessions:</span>
-                              {(() => {
-                                // Sort sessions newest first
-                                const jobSessions = (sessions || [])
-                                  .filter(s => s.jobId === job.id)
-                                  .sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
-                                if (jobSessions.length === 0)
-                                  return <div className="text-gray-500 mt-1">No sessions for this job.</div>;
-                                return (
-                                  <div style={{ overflowX: 'auto', width: '100%' }}>
-                                    <table className="min-w-[340px] border text-xs mt-2 w-full">
-                                      <thead>
-                                        <tr className="bg-gray-100">
-                                          <th className="py-1 px-1 border">Start</th>
-                                          <th className="py-1 px-1 border">End</th>
-                                          <th className="py-1 px-1 border">Duration</th>
-                                          <th className="py-1 px-1 border">Notes</th>
-                                          <th className="py-1 px-1 border">Delete</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        {jobSessions.map(s => (
-                                          <tr key={s.id} className="hover:bg-gray-50">
-                                            <td className="py-1 px-1 border">{formatUKDate(s.startTime)}</td>
-                                            <td className="py-1 px-1 border">{formatUKDate(s.endTime)}</td>
-                                            <td className="py-1 px-1 border">{formatTime(s.duration)}</td>
-                                            <td className="py-1 px-1 border text-[10px] italic">{s.description || '-'}</td>
-                                            <td className="py-1 px-1 border" style={{ textAlign: 'center' }}>
-                                              <button
-                                                className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-full flex items-center justify-center"
-                                                style={{ minWidth: 32, minHeight: 32 }}
-                                                onClick={() => deleteSession(s.id)}
-                                                title="Delete session"
-                                                aria-label="Delete session"
-                                              >
-                                                <FaTrash size={16} />
-                                              </button>
-                                            </td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                );
-                              })()}
+                          {(() => {
+                            const jobSessions = (sessions || [])
+                              .filter(s => s.jobId === job.id)
+                              .sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
+                            if (jobSessions.length === 0)
+                              return <div className="text-slate-500 text-xs mt-1">No sessions for this job.</div>;
+                            return (
+                              <div className="overflow-x-auto w-full rounded-xl border border-slate-200 bg-white">
+                                <table className="min-w-[420px] text-xs w-full">
+                                  <thead>
+                                    <tr className="bg-slate-100 text-slate-600 uppercase tracking-wider text-[10px]">
+                                      <th className="py-2.5 px-3 text-left font-bold">Date</th>
+                                      <th className="py-2.5 px-3 text-left font-bold">Time</th>
+                                      <th className="py-2.5 px-3 text-left font-bold">Duration</th>
+                                      <th className="py-2.5 px-3 text-left font-bold">Notes</th>
+                                      <th className="py-2.5 px-3 text-right font-bold">Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-slate-100">
+                                    {jobSessions.map(s => (
+                                      <tr key={s.id} className="hover:bg-blue-50/40 transition-colors">
+                                        <td className="py-2.5 px-3 font-medium text-slate-800 whitespace-nowrap">
+                                          {formatUKDate(s.startTime)}
+                                        </td>
+                                        <td className="py-2.5 px-3 text-slate-600 whitespace-nowrap">
+                                          {formatUKTime(s.startTime)} &ndash; {s.endTime ? formatUKTime(s.endTime) : "Running"}
+                                        </td>
+                                        <td className="py-2.5 px-3 font-bold text-blue-700 whitespace-nowrap">
+                                          {formatTime(s.duration)}
+                                        </td>
+                                        <td className="py-2.5 px-3 text-slate-600 max-w-[200px] truncate" title={s.description || s.notes || ""}>
+                                          {s.description || s.notes || "-"}
+                                        </td>
+                                        <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                                          <div className="inline-flex items-center gap-1.5">
+                                            <button
+                                              type="button"
+                                              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-2.5 py-1.5 rounded-lg inline-flex items-center gap-1 font-semibold transition-colors"
+                                              onClick={() => openEditSessionModal(s)}
+                                              title="Edit session"
+                                              aria-label="Edit session"
+                                            >
+                                              <FaEdit size={12} /> Edit
+                                            </button>
+                                            <button
+                                              type="button"
+                                              className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 p-1.5 rounded-lg inline-flex items-center justify-center transition-colors"
+                                              onClick={() => deleteSession(s.id)}
+                                              title="Delete session"
+                                              aria-label="Delete session"
+                                            >
+                                              <FaTrash size={12} />
+                                            </button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            );
+                          })()}
 
                               {/* --- DAY ITEMS (Log Day / 1/2 Day) --- */}
                               {(() => {
@@ -648,23 +760,135 @@ export default function JobsPage({
                                 )}
                               </div>
                               {/* --- END PHOTO GALLERY --- */}
-                            </div>
-                          )}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
           ))}
         </div>
       )}
+      {/* Edit Session Modal */}
+      {showEditSession && editingSession && (() => {
+        const preview = getEditSessionPreview();
+        return (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 w-full max-w-md relative" style={{ zIndex: 2001 }}>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                <h3 className="font-extrabold text-lg text-slate-900">Edit Session</h3>
+                <button
+                  type="button"
+                  onClick={() => { setShowEditSession(false); setEditingSession(null); }}
+                  className="text-slate-400 hover:text-slate-700 text-2xl leading-none"
+                  aria-label="Close"
+                >
+                  &times;
+                </button>
+              </div>
+              <form onSubmit={handleEditSessionSave} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none"
+                    value={editSessionForm.date}
+                    onChange={e => { setEditSessionForm(f => ({ ...f, date: e.target.value })); setEditSessionError(""); }}
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                      Start Time
+                    </label>
+                    <input
+                      type="time"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none"
+                      value={editSessionForm.startTime}
+                      onChange={e => { setEditSessionForm(f => ({ ...f, startTime: e.target.value })); setEditSessionError(""); }}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                      End Time
+                    </label>
+                    <input
+                      type="time"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none"
+                      value={editSessionForm.endTime}
+                      onChange={e => { setEditSessionForm(f => ({ ...f, endTime: e.target.value })); setEditSessionError(""); }}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Live Duration Preview */}
+                <div className={`p-3 rounded-xl border text-xs flex items-center justify-between ${preview.valid ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                  <span className="font-semibold">
+                    {preview.valid ? "Recalculated Duration (15m billing):" : "End time must be after start time"}
+                  </span>
+                  {preview.valid && (
+                    <span className="font-extrabold text-sm text-blue-700">
+                      {formatTime(preview.duration)}
+                    </span>
+                  )}
+                </div>
+
+                {editSessionError && (
+                  <p className="text-xs font-semibold text-red-600">{editSessionError}</p>
+                )}
+
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                    Notes / Work Description
+                  </label>
+                  <div className="relative">
+                    <textarea
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 pr-11 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none"
+                      rows={3}
+                      value={editSessionForm.description}
+                      onChange={e => setEditSessionForm(f => ({ ...f, description: e.target.value }))}
+                      placeholder="Optional notes describing the work..."
+                    />
+                    <div className="absolute right-2 bottom-2">
+                      <VoiceInput
+                        onTranscription={(text) => setEditSessionForm(f => ({ ...f, description: f.description ? `${f.description} ${text}` : text }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2.5 pt-2">
+                  <button
+                    type="submit"
+                    disabled={!preview.valid}
+                    className="flex-1 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white font-bold text-sm px-4 py-2.5 rounded-xl shadow-sm transition-colors"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+                    onClick={() => { setShowEditSession(false); setEditingSession(null); }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        );
+      })()}
       {/* Add Job Modal */}
       {showAddJob && (
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
           <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ position: 'relative', zIndex: 2001 }}>
-            <h3 className="font-bold text-lg mb-2 text-indigo-600">Add Job (v2)</h3>
+            <h3 className="font-extrabold text-lg mb-3 text-slate-900">Add Job</h3>
             <form onSubmit={e => { e.preventDefault(); handleJobAdd(); }}>
               <div className="mb-2">
                 <label>Client:</label>
@@ -786,7 +1010,7 @@ export default function JobsPage({
       {showManual && (
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
           <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ position: 'relative', zIndex: 2001 }}>
-            <h3 className="font-bold text-lg mb-2 text-indigo-600">Manual Session Entry (v2)</h3>
+            <h3 className="font-extrabold text-lg mb-3 text-slate-900">Manual Session Entry</h3>
             <form onSubmit={e => { e.preventDefault(); handleManualSave(); }}>
               <div className="mb-2">
                 <label>Start Date & Time:</label>
@@ -845,7 +1069,7 @@ export default function JobsPage({
       {showPhotoModal && (
         <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-40 flex items-center justify-center" style={{ zIndex: 2000, overscrollBehavior: 'contain' }}>
           <div className="bg-white rounded p-6 w-full max-w-md mx-4" style={{ position: 'relative', zIndex: 2001 }}>
-            <h3 className="font-bold text-lg mb-2 text-indigo-600">Add Job Photo (v2)</h3>
+            <h3 className="font-extrabold text-lg mb-3 text-slate-900">Add Job Photo</h3>
             <form onSubmit={handlePhotoAdd}>
               <div className="mb-2">
                 <label>Stage (free text):</label>
@@ -990,19 +1214,6 @@ export default function JobsPage({
           </div>
         </div>
       )}
-      {/* Footer */}
-      <footer className="app-footer" style={{ textAlign: "center", marginTop: "32px" }}>
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "1rem",
-          borderBottom: "1px solid #ccc"
-        }}>
-          <img src={`/logo.png?v=${new Date().getTime()}`} alt="" style={{ height: "36px", width: "36px", objectFit: "contain" }} />
-          <img src={`/itsmyapp-logo.png?v=${new Date().getTime()}`} alt="" style={{ height: "36px", width: "36px", objectFit: "contain" }} />
-        </div>
-      </footer>
     </div>
   );
 }

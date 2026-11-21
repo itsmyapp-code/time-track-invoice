@@ -11,31 +11,20 @@ import {
     FaQuestionCircle,
     FaSignOutAlt,
     FaBars,
-    FaMoon,
-    FaSun,
     FaUserShield
 } from 'react-icons/fa';
 
 export default function Layout({ children, user, isPro, handleLogout }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    // Dark mode state with system preference fallback
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        return localStorage.getItem('theme') === 'dark' ||
-            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    });
-
+    // Enforce ItsMyApp Light-Mode Standard across all sessions
     useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.add('light');
-            localStorage.setItem('theme', 'light');
-        }
-    }, [isDarkMode]);
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        try {
+            localStorage.removeItem('theme');
+        } catch (e) {}
+    }, []);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -51,29 +40,39 @@ export default function Layout({ children, user, isPro, handleLogout }) {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="flex min-h-screen bg-slate-50">
+        <div className="flex min-h-screen bg-slate-100 text-slate-900">
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+                    className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 ></div>
             )}
 
             {/* Sidebar */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 shadow-sm transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}
             >
                 {/* Logo Area */}
-                <div className="flex items-center justify-center h-20 border-b border-slate-100">
+                <div className="px-4 py-5 border-b border-slate-200">
                     <div className="flex items-center gap-3">
-                        <img src="/logo.png" alt="Logo" className="h-10 w-10 object-contain" />
-                        <span className="font-bold text-xl text-slate-800 tracking-tight">TimeTrack</span>
+                        <img src="/logo.png" alt="Time Track Invoice" className="h-10 w-10 object-contain shrink-0" />
+                        <div className="min-w-0">
+                            <span className="block font-extrabold text-base text-slate-900 tracking-tight leading-tight">
+                                Time Track Invoice
+                            </span>
+                            <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200">
+                                <img src="/itsmyapp-logo.png" alt="ItsMyApp" className="h-3.5 w-3.5 object-contain" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                                    Part of ItsMyApp
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+                <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-1">
                     {menuItems.map((item) => (
                         <button
                             key={item.path}
@@ -81,69 +80,65 @@ export default function Layout({ children, user, isPro, handleLogout }) {
                                 navigate(item.path);
                                 setSidebarOpen(false);
                             }}
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${isActive(item.path)
-                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
-                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-150 ${isActive(item.path)
+                                ? 'bg-blue-700 text-white shadow-md shadow-blue-700/20'
+                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                                 }`}
                         >
-                            <span className="text-lg">{item.icon}</span>
+                            <span className={`text-lg ${isActive(item.path) ? 'text-orange-300' : 'text-slate-400'}`}>
+                                {item.icon}
+                            </span>
                             {item.label}
                         </button>
                     ))}
                 </nav>
 
                 {/* Bottom Actions */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50">
+                <div className="p-4 border-t border-slate-200 bg-slate-50/80">
                     <div className="space-y-1">
                         <button
                             onClick={() => { navigate('/settings'); setSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isActive('/settings') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:bg-white hover:text-slate-800'}`}
+                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${isActive('/settings') ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'text-slate-600 hover:bg-white hover:text-slate-900'}`}
                         >
                             <FaCog /> Settings
                         </button>
                         <button
                             onClick={() => { navigate('/help'); setSidebarOpen(false); }}
-                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${isActive('/help') ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:bg-white hover:text-slate-800'}`}
+                            className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${isActive('/help') ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'text-slate-600 hover:bg-white hover:text-slate-900'}`}
                         >
                             <FaQuestionCircle /> Help
-                        </button>
-                        <button
-                            onClick={() => { setIsDarkMode(!isDarkMode); setSidebarOpen(false); }}
-                            className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg transition-colors text-slate-500 hover:bg-white hover:text-slate-800"
-                        >
-                            {isDarkMode ? <FaSun /> : <FaMoon />} {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                         </button>
 
                         {user && user.email && user.email.toLowerCase() === 'martin@cozens.me.uk' && (
                             <button
                                 onClick={() => { navigate('/admin'); setSidebarOpen(false); }}
-                                className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${isActive('/admin') ? 'bg-indigo-100 text-indigo-700' : 'text-indigo-600 hover:bg-slate-50'}`}
+                                className={`w-full flex items-center gap-3 px-4 py-2 text-sm font-bold rounded-xl transition-colors ${isActive('/admin') ? 'bg-orange-50 text-orange-700 border border-orange-200' : 'text-blue-700 hover:bg-white'}`}
                             >
                                 <FaUserShield /> Admin Console
                             </button>
                         )}
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-red-500 hover:bg-red-50 transition-colors mt-2"
+                            className="w-full flex items-center gap-3 px-4 py-2 text-sm font-semibold rounded-xl text-red-600 hover:bg-red-50 transition-colors mt-1"
                         >
                             <FaSignOutAlt /> Logout
                         </button>
                     </div>
-                    <div className="mt-4 flex items-center gap-3 px-2">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+                    <div className="mt-4 pt-3 border-t border-slate-200 flex items-center gap-3 px-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 font-bold text-xs shrink-0">
                             {user?.email?.[0].toUpperCase() || 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                            <p className="text-xs font-semibold text-slate-800 truncate">
                                 {user?.email || 'User'}
                             </p>
-                            <p className="text-[10px] text-slate-400">
+                            <p className="text-[10px] mt-0.5">
                                 {isPro ? (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
                                         Pro Version
                                     </span>
                                 ) : (
-                                    <span className="text-slate-400">Free Tier</span>
+                                    <span className="text-slate-500">Free Tier</span>
                                 )}
                             </p>
                         </div>
@@ -154,27 +149,30 @@ export default function Layout({ children, user, isPro, handleLogout }) {
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col min-h-screen lg:ml-64 relative">
                 {/* Mobile Header */}
-                <header className="lg:hidden h-16 bg-white shadow-sm flex items-center justify-between px-4 z-30">
+                <header className="lg:hidden h-16 bg-white border-b border-slate-200 shadow-xs flex items-center justify-between px-4 sticky top-0 z-30">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="text-slate-500 hover:text-slate-700 focus:outline-none p-2"
+                        aria-label="Open navigation menu"
+                        className="text-slate-600 hover:text-blue-700 focus:outline-none p-2 rounded-lg hover:bg-slate-100 transition-colors"
                     >
-                        <FaBars size={24} />
+                        <FaBars size={22} />
                     </button>
-                    <span className="font-bold text-lg text-slate-800">TimeTrack</span>
-                    {/* Placeholder for balance/notification if needed, or empty div to balance flex */}
-                    <div className="w-8"></div>
+                    <div className="flex items-center gap-2">
+                        <img src="/logo.png" alt="Time Track Invoice" className="h-7 w-7 object-contain" />
+                        <span className="font-extrabold text-base text-slate-900 tracking-tight">Time Track Invoice</span>
+                    </div>
+                    <div className="w-9"></div>
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 bg-slate-50 p-2 md:p-4 lg:p-8">
+                <main className="flex-1 bg-slate-100 p-3 md:p-6 lg:p-8">
                     <div className="max-w-6xl mx-auto">
                         {children}
                     </div>
                 </main>
 
                 {/* Footer */}
-                <GlobalFooter theme="light" />
+                <GlobalFooter />
             </div>
         </div>
     );

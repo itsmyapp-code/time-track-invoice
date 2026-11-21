@@ -48,7 +48,6 @@ export default function Paywall({ user }) {
                 trial_period_days: 14
             });
 
-            // Wait for the CheckoutSession to get attached by the extension
             onSnapshot(docRef, (snap) => {
                 const { error, url } = snap.data() || {};
                 if (error) {
@@ -57,7 +56,6 @@ export default function Paywall({ user }) {
                     alert(`An error occurred: ${error.message}`);
                 }
                 if (url) {
-                    // Redirect to Stripe Checkout
                     window.location.assign(url);
                 }
             });
@@ -70,27 +68,27 @@ export default function Paywall({ user }) {
 
     return (
         <div className="flex flex-col items-center justify-center py-10 px-4 h-full">
-            <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-8 text-center text-slate-800 dark:text-slate-100">
-                <div className="mx-auto w-16 h-16 bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-6">
+            <div className="max-w-md w-full bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center text-slate-900">
+                <div className="mx-auto w-16 h-16 bg-blue-50 border border-blue-200 text-blue-700 rounded-2xl flex items-center justify-center mb-6">
                     <FaLock className="text-2xl" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2 text-slate-900 dark:text-white">Pro Plan Required</h2>
-                <p className="text-slate-500 dark:text-slate-400 mb-8">
-                    Upgrade to a premium subscription to unlock TimeTrack Invoice and empower your business.
+                <h2 className="text-2xl font-extrabold mb-2 text-slate-900">Pro Plan Required</h2>
+                <p className="text-sm text-slate-600 mb-7">
+                    Upgrade to unlock Time Track Invoice and streamline your client billing and time tracking.
                 </p>
 
-                <ul className="text-left space-y-4 mb-8">
-                    {["Unlimited Invoices", "Client Management", "Offline Syncing", "Secure Cloud Backups"].map((feature, i) => (
+                <ul className="text-left space-y-3 mb-8 text-sm text-slate-700">
+                    {["Unlimited PDF Invoices", "Client & Job Management", "Offline Syncing (PWA)", "Secure UK GDPR Cloud Backups"].map((feature, i) => (
                         <li key={i} className="flex items-center gap-3">
-                            <FaCheckCircle className="text-green-500 flex-shrink-0" />
-                            <span>{feature}</span>
+                            <FaCheckCircle className="text-emerald-600 shrink-0" />
+                            <span className="font-medium">{feature}</span>
                         </li>
                     ))}
                 </ul>
 
                 {loading ? (
                     <div className="flex justify-center items-center py-4">
-                        <FaSpinner className="animate-spin text-2xl text-indigo-500" />
+                        <FaSpinner className="animate-spin text-2xl text-blue-700" />
                     </div>
                 ) : products.length > 0 ? (
                     <div className="space-y-4">
@@ -101,29 +99,34 @@ export default function Paywall({ user }) {
                                         key={price.id}
                                         onClick={() => handleSubscribe(price.id)}
                                         disabled={checkoutLoading}
-                                        className="w-full flex-col flex justify-center items-center gap-1 py-3 px-6 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition disabled:opacity-50"
+                                        className="w-full flex-col flex justify-center items-center gap-1 py-3.5 px-6 rounded-xl font-bold text-white bg-blue-700 hover:bg-blue-800 shadow-md shadow-blue-700/20 transition disabled:opacity-50"
                                     >
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 text-sm">
                                             {checkoutLoading ? <FaSpinner className="animate-spin" /> : null}
                                             {checkoutLoading ? "Redirecting to secure checkout..." : `Subscribe to ${product.name} (${(price.unit_amount / 100).toLocaleString('en-GB', { style: 'currency', currency: price.currency })}/${price.interval})`}
                                         </div>
                                         {!checkoutLoading && (
-                                            <span className="text-xs font-normal text-indigo-200">
-                                                Includes 14-day free trial &amp; cooling-off period
+                                            <span className="text-xs font-medium text-orange-200">
+                                                Includes 14-day free trial &amp; statutory cooling-off period
                                             </span>
                                         )}
                                     </button>
                                 ))}
                             </div>
                         ))}
-                        <p className="text-[11px] text-slate-400 mt-3 leading-normal">
-                            Total price shown is inclusive of all taxes (Anti-Drip Pricing). Features the statutory 14-day cooling-off guarantee and 1-click self-service cancellation via the customer portal.
-                        </p>
+                        <div className="mt-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left text-[11px] text-slate-600 leading-relaxed space-y-1">
+                            <p>
+                                <strong className="text-slate-800">Anti-Drip Total Pricing (DMCCA 2024):</strong> Displayed total price is inclusive of all mandatory fees and applicable taxes.
+                            </p>
+                            <p>
+                                <strong className="text-slate-800">14-Day Cooling-Off &amp; Same-Channel Exit:</strong> Statutory 14-day cooling-off applies on initial purchase, trial-to-paid conversion, and annual renewal. Cancel anytime in one click via Settings &rarr; Manage Subscription.
+                            </p>
+                        </div>
                     </div>
                 ) : (
-                    <div className="py-4 border border-dashed border-red-300 bg-red-50 text-red-600 rounded-xl">
-                        <p className="font-semibold">Setup Required</p>
-                        <p className="text-sm">Please create a Recurring Product in your Stripe Dashboard.</p>
+                    <div className="py-4 px-4 border border-dashed border-red-300 bg-red-50 text-red-700 rounded-xl">
+                        <p className="font-bold text-sm">Setup Required</p>
+                        <p className="text-xs mt-1">Please create a Recurring Product in your Stripe Dashboard.</p>
                     </div>
                 )}
             </div>

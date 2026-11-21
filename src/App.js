@@ -51,6 +51,7 @@ import { usePwsReminders } from './hooks/usePwsReminders';
 const SettingsView = ({ settings, updateSettings, navigate }) => {
   const [form, setForm] = useState(settings || {});
   const [loadingPortal, setLoadingPortal] = useState(false);
+  const [savedNotice, setSavedNotice] = useState(false);
   useEffect(() => { setForm(settings || {}); }, [settings]);
 
   const handleManageSubscription = async () => {
@@ -72,46 +73,91 @@ const SettingsView = ({ settings, updateSettings, navigate }) => {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-2">Business Details (for invoices)</h2>
-      <form onSubmit={e => { e.preventDefault(); updateSettings(form); }}>
-        {["ownerName", "address", "town", "county", "postcode", "phone", "email", "vatNumber", "bankAccountName", "sortCode", "accountNumber", "mileageRate", "termsConditions"].map(field => (
-          <div key={field} className="mb-2">
-            <label className="mr-2">{field.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())}:</label>
-            {field === "termsConditions" ? (
-              <textarea className="border rounded px-2 py-1 w-full" rows={4}
-                value={form[field] || ""}
-                onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-              />
-            ) : (
-              <input className="border rounded px-2 py-1 w-full"
-                value={form[field] || ""}
-                onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
-              />
+    <div className="max-w-3xl mx-auto space-y-6">
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
+          <div>
+            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Business Details</h2>
+            <p className="text-sm text-slate-500 mt-0.5">Shown on your PDF invoices and payment instructions.</p>
+          </div>
+          <button
+            type="button"
+            className="px-4 py-2 rounded-xl text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+            onClick={() => navigate("/dashboard")}
+          >
+            &larr; Back to Dashboard
+          </button>
+        </div>
+
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            updateSettings(form);
+            setSavedNotice(true);
+            setTimeout(() => setSavedNotice(false), 3000);
+          }}
+          className="space-y-4"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {["ownerName", "address", "town", "county", "postcode", "phone", "email", "vatNumber", "bankAccountName", "sortCode", "accountNumber", "mileageRate", "termsConditions"].map(field => (
+              <div key={field} className={field === "termsConditions" || field === "address" ? "sm:col-span-2" : ""}>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  {field.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())}
+                </label>
+                {field === "termsConditions" ? (
+                  <textarea
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                    rows={4}
+                    value={form[field] || ""}
+                    onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
+                  />
+                ) : (
+                  <input
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                    value={form[field] || ""}
+                    onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-slate-100">
+            <button
+              type="submit"
+              className="bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm rounded-xl px-6 py-2.5 shadow-sm transition-colors"
+            >
+              Save Details
+            </button>
+            <button
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-sm transition-colors disabled:opacity-50"
+              disabled={loadingPortal}
+              type="button"
+              onClick={handleManageSubscription}
+            >
+              {loadingPortal ? "Loading Portal..." : "Manage Subscription"}
+            </button>
+            {savedNotice && (
+              <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
+                Settings saved!
+              </span>
             )}
           </div>
-        ))}
-        <button className="bg-blue-600 text-white rounded px-3 py-2 mt-2">Save</button>
-      </form>
-      <div className="flex gap-4 mt-6">
-        <button className="bg-slate-200 text-slate-800 px-4 py-2 rounded hover:bg-slate-300" onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
-        <button className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 disabled:opacity-50" disabled={loadingPortal} type="button" onClick={handleManageSubscription}>
-          {loadingPortal ? "Loading Portal..." : "Manage Subscription"}
-        </button>
+        </form>
       </div>
 
-      {/* Statutory Subscription & Compliance Notice */}
-      <div className="mt-8 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 space-y-2">
-        <p className="font-semibold text-slate-800">Subscription &amp; Consumer Protection Notice (DMCCA 2024 / UK GDPR):</p>
+      {/* Statutory Subscription & Compliance Notice (DMCCA 2024 / UK GDPR) */}
+      <div className="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm text-xs text-slate-600 space-y-2.5 leading-relaxed">
+        <p className="font-bold text-slate-900 text-sm">Subscription &amp; Consumer Protection Notice (DMCCA 2024 / UK GDPR)</p>
         <p>
-          <strong>The "Same-Channel" Exit:</strong> You may modify or terminate your subscription at any time with a single click using the "Manage Subscription" button above. Cancellations are processed immediately through our secure customer billing portal.
+          <strong className="text-slate-800">The &quot;Same-Channel&quot; Exit:</strong> You may modify or terminate your subscription at any time with a single click using the &quot;Manage Subscription&quot; button above. Cancellations are processed immediately through our secure Stripe customer billing portal with zero retention walls or forced feedback forms.
         </p>
         <p>
-          <strong>14-Day Cooling-Off Period:</strong> You retain statutory cooling-off cancellation rights for 14 days following any initial subscription or annual renewal. For cancellations executed within this window, a proportionate refund is issued.
+          <strong className="text-slate-800">14-Day Cooling-Off Period:</strong> You retain statutory 14-day cooling-off cancellation rights following your initial subscription, transition from a free trial to a paid plan, or any automatic annual renewal. Proportionate refunds are issued for unconsumed periods where applicable.
         </p>
         <p>
-          For compliance or SAR requests, contact our Data Privacy Lead at{" "}
-          <a href="mailto:hello@itsmyapp.co.uk" className="text-indigo-600 underline">
+          <strong className="text-slate-800">Anti-Drip Pricing:</strong> All displayed subscription prices are inclusive of mandatory fees and applicable taxes. For compliance or Subject Access Requests (SARs), contact our Data Privacy Lead at{" "}
+          <a href="mailto:hello@itsmyapp.co.uk" className="text-blue-700 font-semibold underline hover:text-orange-600">
             hello@itsmyapp.co.uk
           </a>.
         </p>
@@ -206,7 +252,16 @@ const App = () => {
                 startTime: action.startTime,
                 endTime: action.endTime,
                 duration: action.duration,
+                description: action.description || "",
                 createdAt: serverTimestamp()
+              });
+            }
+            if (action.type === 'updateSession') {
+              await updateDoc(doc(db, "users", user.uid, "sessions", action.sessionId), {
+                startTime: action.startTime,
+                endTime: action.endTime,
+                duration: action.duration,
+                description: action.description || ""
               });
             }
             if (action.type === 'addClient') {
@@ -378,11 +433,15 @@ const App = () => {
     })).reverse(), [jobs, sessions]);
 
   // Auth handlers
-  const handleLogin = (email, password) => {
+  const handleLogin = async (email, password) => {
     setAuthError(null);
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => navigate("/dashboard"))
-      .catch(e => setAuthError(e.message));
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/dashboard");
+    } catch (e) {
+      setAuthError(e.message);
+      throw e;
+    }
   };
   const handleSignUp = async (email, password) => {
     setAuthError(null);
@@ -393,21 +452,23 @@ const App = () => {
       return true;
     } catch (e) {
       setAuthError(e.message);
-      return false;
+      throw e;
     }
   };
   const handleLogout = () => signOut(auth);
   const handlePasswordReset = async email => {
     setAuthError(null);
-    if (email) {
-      try {
-        await sendPasswordResetEmail(auth, email);
-        alert("Password reset email sent! Redirecting to login...");
-        setUser(null);
-      } catch (e) {
-        setAuthError(e.message);
-      }
-    } else setAuthError("Enter email first.");
+    if (!email) {
+      const err = new Error("Enter email first.");
+      setAuthError(err.message);
+      throw err;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (e) {
+      setAuthError(e.message);
+      throw e;
+    }
   };
 
   // CRUD handlers WITH OFFLINE SUPPORT!
@@ -474,6 +535,27 @@ const App = () => {
         await addDoc(collection(db, "users", user.uid, "sessions"), { jobId, startTime, endTime, duration, description, createdAt: serverTimestamp() });
       } catch (error) {
         console.error("Manual entry error:", error);
+      }
+    }
+  }, [user, isOnline]);
+
+  const updateSession = useCallback(async (sessionId, { startTime, endTime, duration, description }) => {
+    if (user && sessionId) {
+      const payload = {
+        startTime,
+        endTime,
+        duration,
+        description: description ?? ""
+      };
+      if (!isOnline) {
+        await addOfflineAction({ type: 'updateSession', sessionId, ...payload });
+        setSessions(prev => prev.map(s => s.id === sessionId ? { ...s, ...payload } : s));
+        return;
+      }
+      try {
+        await updateDoc(doc(db, "users", user.uid, "sessions", sessionId), payload);
+      } catch (error) {
+        console.error("Update session error:", error);
       }
     }
   }, [user, isOnline]);
@@ -727,10 +809,10 @@ const App = () => {
               onSignUpSuccess={() => setPendingSignUp(true)}
             />
           ) : isLoadingPro && user.email !== 'martin@cozens.me.uk' ? (
-            <div className="flex h-screen items-center justify-center bg-gray-50">
+            <div className="flex h-screen items-center justify-center bg-slate-100">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading your account...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700 mx-auto mb-4"></div>
+                <p className="text-slate-600 font-medium">Loading your account...</p>
               </div>
             </div>
           ) : (!isPro && (!user.email || user.email.toLowerCase() !== 'martin@cozens.me.uk')) ? (
@@ -763,6 +845,7 @@ const App = () => {
                     startTimer={startTimer}
                     stopTimer={stopTimer}
                     handleManualEntry={handleManualEntry}
+                    updateSession={updateSession}
                     sessions={sessions}
                     handleAddJob={handleAddJob}
                     editJob={editJob}

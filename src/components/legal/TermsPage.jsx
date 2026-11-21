@@ -9,7 +9,7 @@ export default function TermsPage() {
       effectiveDate="3 June 2026"
     >
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">1. Acceptance of Terms</h2>
+        <h2 className="text-xl font-bold text-slate-900">1. Acceptance of Terms</h2>
         <p>
           By accessing, installing, browsing, or using <strong>Time Track Invoice</strong> (the &quot;Service&quot;,
           operated by itsmyapp.co.uk and its enterprise operations), you explicitly agree to be bound by these
@@ -18,15 +18,15 @@ export default function TermsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">2. User Responsibilities &amp; Account Security</h2>
+        <h2 className="text-xl font-bold text-slate-900">2. User Responsibilities &amp; Account Security</h2>
         <p>
           Users assume full liability for maintaining the confidentiality of their account credentials, session states,
           offline authentication tokens, and any locally managed business records (such as client rates, invoices, and
-          shared lockbox access codes). You are entirely responsible for all activity conducted under your authenticated UID.
+          job notes). You are entirely responsible for all activity conducted under your authenticated account.
         </p>
         <p>
           You agree to immediately notify us at{" "}
-          <a href="mailto:hello@itsmyapp.co.uk" className="text-indigo-400 underline">
+          <a href="mailto:hello@itsmyapp.co.uk" className="text-blue-700 font-semibold underline hover:text-orange-600">
             hello@itsmyapp.co.uk
           </a>{" "}
           of any unauthorized use or security compromise regarding your account.
@@ -34,9 +34,9 @@ export default function TermsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">3. Prohibited Conduct</h2>
+        <h2 className="text-xl font-bold text-slate-900">3. Prohibited Conduct</h2>
         <p>Users must not engage in any of the following activities:</p>
-        <ul className="list-disc pl-6 space-y-2 text-slate-300">
+        <ul className="list-disc pl-6 space-y-2 text-slate-700">
           <li>Unlawful use, fraudulent time tracking, deceptive billing, or tax evasion practices.</li>
           <li>Deploying malware, viruses, worms, Trojan horses, or harmful code to our infrastructure or users.</li>
           <li>Automated scraping, bulk querying, data harvesting, or denial-of-service attempts.</li>
@@ -46,40 +46,39 @@ export default function TermsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">4. Subscriptions, Pricing &amp; Cancellation Automation</h2>
-        <div className="bg-slate-800/60 p-4 rounded-lg border border-slate-700/80 space-y-2 text-slate-300">
-          <p className="font-semibold text-white">The &quot;Same-Channel&quot; Exit (DMCCA / UK Framework):</p>
+        <h2 className="text-xl font-bold text-slate-900">4. Subscriptions, Pricing &amp; Cancellation Automation</h2>
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-slate-700">
+          <p className="font-bold text-slate-900">The &quot;Same-Channel&quot; Exit (DMCCA 2024 / UK Framework):</p>
           <p>
             Any user subscribing to paid tiers or Pro plans can natively cancel or modify their subscription at any
             time using the clear, single-click &quot;Manage Subscription&quot; link directly inside their in-app Settings profile.
             Cancellation is direct, instantaneous, and entirely void of conversion sludge, retention walls, or forced questionnaires.
           </p>
         </div>
-        <div className="bg-slate-800/60 p-4 rounded-lg border border-slate-700/80 space-y-2 text-slate-300">
-          <p className="font-semibold text-white">Statutory 14-Day Cooling-Off Cancellation Rights:</p>
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-slate-700">
+          <p className="font-bold text-slate-900">Statutory 14-Day Cooling-Off Cancellation Rights:</p>
           <p>
             In accordance with statutory consumer rights, our state logic monitors and honours a 14-day cooling-off
             cancellation period triggered at:
           </p>
           <ul className="list-disc pl-6 space-y-1">
             <li>The start of any initial subscription contract.</li>
-            <li>The transition from a free/discounted trial period to a paid plan.</li>
+            <li>The transition from a free/discounted trial period to a standard paid plan.</li>
             <li>Following any automatic renewal extending the contract by 12 months or more.</li>
           </ul>
           <p className="pt-1">
-            <strong>Proportionate Refund Calculations:</strong> If a cancellation occurs within the statutory 14-day
-            cooling-off window following a renewal, our automated billing engine credits a proportionate refund corresponding
-            to the unconsumed billing duration.
+            <strong className="text-slate-900">Proportionate Refund Calculations:</strong> If a cancellation occurs within the statutory 14-day
+            cooling-off window following a trial conversion or renewal, a proportionate refund is issued for the unconsumed billing duration.
           </p>
         </div>
         <p>
-          <strong>Anti-Drip Pricing:</strong> Displayed subscription prices at checkout represent the absolute total cost,
+          <strong className="text-slate-900">Anti-Drip Pricing:</strong> Displayed subscription prices at checkout represent the absolute total cost,
           including all mandatory fees, payment processing costs, and applicable taxes.
         </p>
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">5. Limitation of Liability</h2>
+        <h2 className="text-xl font-bold text-slate-900">5. Limitation of Liability</h2>
         <p>
           To the maximum extent permitted under UK law, the Service is provided on an &quot;as-is&quot; and &quot;as-available&quot;
           basis. The Data Controller and itsmyapp.co.uk accept no liability for any indirect, incidental, special, or consequential
@@ -88,7 +87,7 @@ export default function TermsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">6. Termination</h2>
+        <h2 className="text-xl font-bold text-slate-900">6. Termination</h2>
         <p>
           We reserve the right to instantly suspend or terminate user accounts or revoke cloud synchronization following a
           verified breach of these terms, harmful system abuse, or fraudulent activity.
@@ -96,7 +95,7 @@ export default function TermsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">7. Governing Law &amp; Jurisdiction</h2>
+        <h2 className="text-xl font-bold text-slate-900">7. Governing Law &amp; Jurisdiction</h2>
         <p>
           These Terms are governed by and construed in accordance with the laws of England and Wales. Any disputes
           shall be subject to the exclusive jurisdiction of the courts of England and Wales.
@@ -105,4 +104,3 @@ export default function TermsPage() {
     </LegalLayout>
   );
 }
-

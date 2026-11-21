@@ -1,17 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function GlobalFooter({ theme = "light" }) {
-  const isDark = theme === "dark";
-
+export default function GlobalFooter() {
   return (
-    <footer
-      className={`border-t transition-colors ${
-        isDark
-          ? "border-slate-800 bg-slate-950 text-slate-400"
-          : "border-slate-200 bg-white text-slate-600"
-      }`}
-    >
+    <footer className="border-t border-slate-200 bg-white text-slate-600">
       <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col items-center text-center">
         {/* itsmyapp.co.uk Banner Card / Image */}
         <div className="w-full max-w-2xl mb-6">
@@ -19,13 +11,13 @@ export default function GlobalFooter({ theme = "light" }) {
             href="https://itsmyapp.co.uk"
             target="_blank"
             rel="noopener noreferrer"
-            className="block rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.01] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="block rounded-2xl overflow-hidden border border-slate-200 shadow-sm transition-all duration-200 hover:scale-[1.01] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-600"
             title="Visit itsmyapp.co.uk - Web Development & Digital Solutions"
           >
             <img
               src="/itsmyapp-banner.png"
               alt="Designed & Developed by itsmyapp.co.uk"
-              className="w-full h-auto object-contain rounded-xl border border-slate-700/50"
+              className="w-full h-auto object-contain"
             />
           </a>
         </div>
@@ -33,62 +25,48 @@ export default function GlobalFooter({ theme = "light" }) {
         {/* Legal Navigation Links */}
         <nav
           aria-label="Compliance and Legal Links"
-          className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-xs md:text-sm font-medium mb-5"
+          className="flex flex-wrap justify-center items-center gap-x-5 gap-y-2 text-xs md:text-sm font-semibold mb-5"
         >
           <Link
             to="/terms"
-            className={`transition-colors underline-offset-4 hover:underline ${
-              isDark ? "hover:text-white text-slate-300" : "hover:text-indigo-600 text-slate-700"
-            }`}
+            className="text-slate-700 hover:text-blue-700 transition-colors underline-offset-4 hover:underline"
           >
             Terms of Service
           </Link>
-          <span className="opacity-30" aria-hidden="true">•</span>
+          <span className="text-slate-300" aria-hidden="true">&bull;</span>
           <Link
             to="/privacy"
-            className={`transition-colors underline-offset-4 hover:underline ${
-              isDark ? "hover:text-white text-slate-300" : "hover:text-indigo-600 text-slate-700"
-            }`}
+            className="text-slate-700 hover:text-blue-700 transition-colors underline-offset-4 hover:underline"
           >
             Privacy Policy
           </Link>
-          <span className="opacity-30" aria-hidden="true">•</span>
+          <span className="text-slate-300" aria-hidden="true">&bull;</span>
           <Link
             to="/cookies"
-            className={`transition-colors underline-offset-4 hover:underline ${
-              isDark ? "hover:text-white text-slate-300" : "hover:text-indigo-600 text-slate-700"
-            }`}
+            className="text-slate-700 hover:text-blue-700 transition-colors underline-offset-4 hover:underline"
           >
             Cookie Policy
           </Link>
-          <span className="opacity-30" aria-hidden="true">•</span>
+          <span className="text-slate-300" aria-hidden="true">&bull;</span>
           <Link
             to="/accessibility"
-            className={`transition-colors underline-offset-4 hover:underline ${
-              isDark ? "hover:text-white text-slate-300" : "hover:text-indigo-600 text-slate-700"
-            }`}
+            className="text-slate-700 hover:text-blue-700 transition-colors underline-offset-4 hover:underline"
           >
             Accessibility Statement
           </Link>
         </nav>
 
         {/* Part III: Public Transparency Callout (UK GDPR / DUAA Layered Notice) */}
-        <div
-          className={`w-full max-w-2xl p-4 rounded-lg text-xs leading-relaxed mb-5 border text-left ${
-            isDark
-              ? "bg-slate-900/80 border-slate-800 text-slate-300"
-              : "bg-slate-50 border-slate-200 text-slate-700"
-          }`}
-        >
-          <p className="font-semibold mb-1 text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+        <div className="w-full max-w-2xl p-4 rounded-2xl text-xs leading-relaxed mb-5 border border-slate-200 bg-slate-50 text-slate-700 text-left">
+          <p className="font-bold mb-1 text-slate-900 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-blue-700" aria-hidden="true"></span>
             Data Privacy &amp; Compliance Queries:
           </p>
           <p>
             For any questions regarding your data rights, or to submit an inquiry, please contact our Data Privacy Lead directly at{" "}
             <a
               href="mailto:hello@itsmyapp.co.uk"
-              className="font-medium underline hover:text-indigo-500"
+              className="font-semibold text-blue-700 underline hover:text-orange-600 transition-colors"
             >
               hello@itsmyapp.co.uk
             </a>
@@ -97,13 +75,12 @@ export default function GlobalFooter({ theme = "light" }) {
         </div>
 
         {/* Copyright and Attribution */}
-        <div className="text-xs text-slate-400">
+        <div className="text-xs text-slate-500">
           <p>
-            Powered by Time Track Invoice © 2026 ItsMyApp.co.uk | All rights reserved
+            Powered by Time Track Invoice &copy; 2026 ItsMyApp.co.uk | All rights reserved
           </p>
         </div>
       </div>
     </footer>
   );
 }
-

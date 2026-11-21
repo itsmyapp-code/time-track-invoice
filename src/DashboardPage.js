@@ -155,98 +155,102 @@ export default function DashboardPage({
 
   return (
     <div className="p-2 md:p-4" style={{ minHeight: "100vh" }}>
-      {/* Mobile Dropdown Menu Button on the left */}
-      {/* Mobile Menu Removed */}
-      <h2 className="text-2xl font-bold mb-4 md:mb-6 flex items-center gap-2 text-slate-800" style={{ justifyContent: "center" }}>
-        <FaChartPie className="text-indigo-600" /> Dashboard
+      <h2 className="text-2xl font-extrabold mb-6 flex items-center justify-center gap-2.5 text-slate-900 tracking-tight">
+        <FaChartPie className="text-blue-700" /> Dashboard
       </h2>
 
-      <div className="flex flex-col gap-4 mb-6" style={{ alignItems: "center" }}>
+      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 mb-6 flex flex-col gap-5 items-center">
         <div className="flex gap-4 items-center">
           {globalStart ? (
-            <button onClick={handleStopGlobalClick} className="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-full shadow-lg flex items-center gap-2 text-xl transition-transform hover:scale-105">
+            <button onClick={handleStopGlobalClick} className="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-9 rounded-full shadow-lg shadow-red-600/25 flex items-center gap-2.5 text-lg transition-all hover:scale-[1.02]">
               <FaStop /> Stop Timer
             </button>
           ) : (
-            <button onClick={handleStartGlobal} className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg flex items-center gap-2 text-xl transition-transform hover:scale-105">
+            <button onClick={handleStartGlobal} className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 px-9 rounded-full shadow-lg shadow-blue-700/25 flex items-center gap-2.5 text-lg transition-all hover:scale-[1.02]">
               <FaPlay /> Start Timer
             </button>
           )}
         </div>
-        <div className="flex gap-4">
-          <button onClick={() => openDayModal('halfDay')} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded shadow-md flex items-center gap-2 text-lg transition-transform hover:scale-105">
+        <div className="flex flex-wrap justify-center gap-3">
+          <button onClick={() => openDayModal('halfDay')} className="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-5 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-colors">
             <FaCalendarCheck /> Log 1/2 Day
           </button>
-          <button onClick={() => openDayModal('day')} className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded shadow-md flex items-center gap-2 text-lg transition-transform hover:scale-105">
+          <button onClick={() => openDayModal('day')} className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-colors">
             <FaCalendarDay /> Log Day
           </button>
-          <button onClick={() => openDayModal('mileage')} className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded shadow-md flex items-center gap-2 text-lg transition-transform hover:scale-105">
+          <button onClick={() => openDayModal('mileage')} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-sm flex items-center gap-2 text-sm transition-colors">
             <FaRoad /> Log Mileage
           </button>
         </div>
       </div>
 
-      <div className="grid gap-4 md:gap-6" style={{ gridTemplateColumns: "1fr", display: "grid" }}>
-        {/* On medium screens and up, use 3 columns */}
-        <div className="md:grid md:grid-cols-2 md:gap-6" style={{ display: "contents" }}>
-          {/* Running Timers */}
-          <div className="app-card bg-white transition hover:scale-105 hover:shadow-lg" style={{ marginBottom: 12, borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.04)", padding: "16px" }}>
-            <h3 className="font-bold text-blue-700 mb-2 flex items-center gap-1"><FaClock /> Running Timers</h3>
-            {runningSessions.length === 0 ? (
-              <div className="text-gray-500">No timers running</div>
-            ) : (
-              <ul>
-                {runningSessions.map(s => {
-                  const job = jobs.find(j => j.id === s.jobId);
-                  const client = job ? clients.find(c => c.id === job.clientId) : null;
-                  return (
-                    <li key={s.id} className="mb-2">
-                      <span className="font-semibold">{job?.name}</span>
-                      {client && <span> ({client.name})</span>}<br />
-                      Started: {formatUKDate(s.startTime)}<br />
-                      Elapsed: {formatTime(Date.now() - s.startTime)}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-          {/* Recent Activity */}
-          <div className="app-card bg-white transition hover:scale-105 hover:shadow-lg" style={{ marginBottom: 12, borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.04)", padding: "16px" }}>
-            <h3 className="font-bold text-blue-700 mb-2 flex items-center gap-1"><FaListAlt /> Recent Activity</h3>
-            {latestSessions.length === 0 ? (
-              <div className="text-gray-500">No recent sessions</div>
-            ) : (
-              <ul>
-                {latestSessions.map(s => {
-                  const job = jobs.find(j => j.id === s.jobId);
-                  const client = job ? clients.find(c => c.id === job.clientId) : null;
-                  return (
-                    <li key={s.id} className="mb-2">
-                      <span className="font-semibold">{job?.name}</span>
-                      {client && <span> ({client.name})</span>}<br />
-                      {formatUKDate(s.startTime)} – {formatUKDate(s.endTime)}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Running Timers */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+          <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2 text-base">
+            <FaClock className="text-blue-700" /> Running Timers
+          </h3>
+          {runningSessions.length === 0 ? (
+            <div className="text-sm text-slate-500">No timers currently running.</div>
+          ) : (
+            <ul className="space-y-3 text-sm">
+              {runningSessions.map(s => {
+                const job = jobs.find(j => j.id === s.jobId);
+                const client = job ? clients.find(c => c.id === job.clientId) : null;
+                return (
+                  <li key={s.id} className="p-3 rounded-xl bg-blue-50/70 border border-blue-200">
+                    <div className="font-bold text-slate-900">
+                      {job?.name} {client && <span className="font-medium text-slate-600">({client.name})</span>}
+                    </div>
+                    <div className="text-xs text-slate-600 mt-1">
+                      Started: {formatUKDate(s.startTime)} &bull; Elapsed: <strong className="text-blue-700">{formatTime(Date.now() - s.startTime)}</strong>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+        {/* Recent Activity */}
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+          <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2 text-base">
+            <FaListAlt className="text-orange-500" /> Recent Activity
+          </h3>
+          {latestSessions.length === 0 ? (
+            <div className="text-sm text-slate-500">No recent sessions.</div>
+          ) : (
+            <ul className="divide-y divide-slate-100 text-sm">
+              {latestSessions.map(s => {
+                const job = jobs.find(j => j.id === s.jobId);
+                const client = job ? clients.find(c => c.id === job.clientId) : null;
+                return (
+                  <li key={s.id} className="py-2.5 first:pt-0 last:pb-0">
+                    <div className="font-semibold text-slate-900">
+                      {job?.name} {client && <span className="font-normal text-slate-500">({client.name})</span>}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-0.5">
+                      {formatUKDate(s.startTime)} &ndash; {formatUKDate(s.endTime)}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
       </div>
-      {/* Footer - mobile friendly */}
-      {/* Footer Removed */}
 
       {/* Stop Timer Modal */}
       {showStopModal && (
-        <div className="fixed inset-0 z-[2000] bg-black bg-opacity-40 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+        <div className="fixed inset-0 z-[2000] bg-slate-900/50 backdrop-blur-xs overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
-              <h3 className="text-xl font-bold mb-4 text-indigo-600">Assign Time (v2)</h3>
-              <p className="mb-4 text-gray-700">Elapsed: {formatTime(Date.now() - (globalStart || Date.now()))}</p>
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
+              <h3 className="text-xl font-extrabold mb-2 text-slate-900">Assign Time</h3>
+              <p className="mb-4 text-sm text-slate-600">
+                Elapsed: <strong className="text-blue-700">{formatTime(Date.now() - (globalStart || Date.now()))}</strong>
+              </p>
               <div className="grid grid-cols-1 gap-3">
                 <select
-                  className="p-3 border rounded w-full text-slate-900 bg-white"
+                  className="p-3 border border-slate-300 rounded-xl w-full text-sm text-slate-900 bg-white focus:border-blue-600 outline-none"
                   value={formClientId}
                   onChange={e => { setFormClientId(e.target.value); setFormJobId(""); }}
                 >
@@ -254,7 +258,7 @@ export default function DashboardPage({
                   {activeClients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
                 <select
-                  className="p-3 border rounded w-full text-slate-900 bg-white"
+                  className="p-3 border border-slate-300 rounded-xl w-full text-sm text-slate-900 bg-white focus:border-blue-600 outline-none disabled:bg-slate-50"
                   value={formJobId}
                   onChange={e => setFormJobId(e.target.value)}
                   disabled={!formClientId}
@@ -264,27 +268,27 @@ export default function DashboardPage({
                 </select>
                 <div className="relative">
                   <textarea
-                    className="p-3 border rounded w-full text-slate-900 bg-white pr-12"
+                    className="p-3 border border-slate-300 rounded-xl w-full text-sm text-slate-900 bg-white pr-12 focus:border-blue-600 outline-none"
                     placeholder="Description / Notes (optional)"
                     rows={3}
                     value={formDescription}
                     onChange={e => setFormDescription(e.target.value)}
                   />
                   <div className="absolute right-2 bottom-2">
-                    <VoiceInput 
-                      onTranscription={(text) => setFormDescription(prev => prev ? `${prev} ${text}` : text)} 
+                    <VoiceInput
+                      onTranscription={(text) => setFormDescription(prev => prev ? `${prev} ${text}` : text)}
                     />
                   </div>
                 </div>
               </div>
               <div className="flex flex-col gap-2 mt-6">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full font-bold" onClick={submitStopGlobal}>Save Entry</button>
+                <button className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2.5 rounded-xl w-full font-bold text-sm transition-colors" onClick={submitStopGlobal}>Save Entry</button>
                 <div className="flex gap-2">
-                  <button className="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded flex-1 text-sm font-semibold" onClick={handleDiscardTimer}>Discard</button>
-                  <button className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded flex-1 text-sm font-semibold" onClick={() => setShowStopModal(false)}>Cancel</button>
+                  <button className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-4 py-2 rounded-xl flex-1 text-sm font-semibold transition-colors" onClick={handleDiscardTimer}>Discard</button>
+                  <button className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl flex-1 text-sm font-semibold transition-colors" onClick={() => setShowStopModal(false)}>Cancel</button>
                 </div>
               </div>
-              <button className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 text-2xl" onClick={() => setShowStopModal(false)} title="Close">&times;</button>
+              <button className="absolute top-4 right-5 text-slate-400 hover:text-slate-700 text-2xl leading-none" onClick={() => setShowStopModal(false)} title="Close">&times;</button>
             </div>
           </div>
         </div>
@@ -292,13 +296,13 @@ export default function DashboardPage({
 
       {/* Add Day Item Modal */}
       {showDayModal && (
-        <div className="fixed inset-0 z-[2000] bg-black bg-opacity-40 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+        <div className="fixed inset-0 z-[2000] bg-slate-900/50 backdrop-blur-xs overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
-              <h3 className="text-xl font-bold mb-4 text-indigo-600">Log {dayType === 'day' ? '1 Day (v2)' : dayType === 'halfDay' ? '1/2 Day (v2)' : 'Mileage (v2)'}</h3>
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-lg relative" style={{ zIndex: 2001 }}>
+              <h3 className="text-xl font-extrabold mb-4 text-slate-900">Log {dayType === 'day' ? '1 Day' : dayType === 'halfDay' ? '1/2 Day' : 'Mileage'}</h3>
               <div className="grid grid-cols-1 gap-3">
                 <select
-                  className="p-3 border rounded w-full text-slate-900 bg-white"
+                  className="p-3 border border-slate-300 rounded-xl w-full text-sm text-slate-900 bg-white focus:border-blue-600 outline-none"
                   value={formClientId}
                   onChange={e => { setFormClientId(e.target.value); setFormJobId(""); }}
                 >
@@ -306,7 +310,7 @@ export default function DashboardPage({
                   {activeClients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
                 <select
-                  className="p-3 border rounded w-full text-slate-900 bg-white"
+                  className="p-3 border border-slate-300 rounded-xl w-full text-sm text-slate-900 bg-white focus:border-blue-600 outline-none disabled:bg-slate-50"
                   value={formJobId}
                   onChange={e => setFormJobId(e.target.value)}
                   disabled={!formClientId}
@@ -314,24 +318,24 @@ export default function DashboardPage({
                   <option value="">Select Job</option>
                   {filteredJobs.map(j => <option key={j.id} value={j.id}>{j.name}</option>)}
                 </select>
-                <input type="date" className="p-3 border rounded w-full text-slate-900 bg-white" value={formDate} onChange={e => setFormDate(e.target.value)} />
+                <input type="date" className="p-3 border border-slate-300 rounded-xl w-full text-sm text-slate-900 bg-white focus:border-blue-600 outline-none" value={formDate} onChange={e => setFormDate(e.target.value)} />
                 {dayType === 'mileage' && (
                   <input
                     type="number"
                     step="0.1"
                     min="0"
                     placeholder="Total Miles"
-                    className="p-3 border rounded w-full text-slate-900 bg-white"
+                    className="p-3 border border-slate-300 rounded-xl w-full text-sm text-slate-900 bg-white focus:border-blue-600 outline-none"
                     value={formMiles}
                     onChange={e => setFormMiles(e.target.value)}
                   />
                 )}
               </div>
-              <div className="flex gap-2 mt-6">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex-1" onClick={submitDayForm}>Save Entry</button>
-                <button className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded flex-1" onClick={() => setShowDayModal(false)}>Cancel</button>
+              <div className="flex gap-2.5 mt-6">
+                <button className="bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm px-4 py-2.5 rounded-xl flex-1 transition-colors" onClick={submitDayForm}>Save Entry</button>
+                <button className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm px-4 py-2.5 rounded-xl flex-1 transition-colors" onClick={() => setShowDayModal(false)}>Cancel</button>
               </div>
-              <button className="absolute top-2 right-4 text-gray-400 hover:text-gray-700 text-2xl" onClick={() => setShowDayModal(false)} title="Close">&times;</button>
+              <button className="absolute top-4 right-5 text-slate-400 hover:text-slate-700 text-2xl leading-none" onClick={() => setShowDayModal(false)} title="Close">&times;</button>
             </div>
           </div>
         </div>
