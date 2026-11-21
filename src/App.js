@@ -106,8 +106,8 @@ const SettingsView = ({ settings, updateSettings, navigate }) => {
                 </label>
                 {field === "termsConditions" ? (
                   <textarea
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition"
-                    rows={4}
+                    className="w-full min-h-[300px] resize-y rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm leading-relaxed text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none transition"
+                    rows={14}
                     value={form[field] || ""}
                     onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
                   />
